@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==== ENUMS ====
+
+enum RequestStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+  REJECTED
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RequestSource {
+  WEB
+  TELEGRAM
+  PHONE
+}
+
+enum Role {
+  user
+  admin
+  superuser
+}
+
+enum Department {
+  AHO
+  ADMIN
+  STATIONAR
+  GYN
+  INFECT
+  GP
+  OPHTHALMO
+  ENT
+  NURSE
+  EMERGENCY
+  UZI
+  STATISTICS
+  DIABET_SCHOOL
+  ENDOSCOPY
+  LAB
+  VOENKOM
+  ELDERLY
+  PREVENTION
+  PAID
+  FUNCTIONAL
+  VACCINATION
+  PROCEDURE
+  REGISTRY
+  XRAY
+  THERAPY_1
+  THERAPY_2
+  THERAPY_3
+  THERAPY_4
+  THERAPY_5
+  PHYSIOTHERAPY
+  SURGERY
+  STERILIZATION
+  HEALTH_CENTER
+}
+
+// ==== MODELS ====
+
+model User {
+  id             Int        @id @default(autoincrement())
+  lastName       String     @db.VarChar(100)
+  firstName      String     @db.VarChar(100)
+  middleName     String?    @db.VarChar(100)
+  passwordHash   String
+  role           Role       @default(user)
+  birthDate      DateTime   @db.Date
+  snils          String     @unique @db.VarChar(20)
+  mobilePhone    String     @db.VarChar(20)
+  internalPhone  String     @db.VarChar(10)
+  position       String     @db.VarChar(100)
+  department     Department
+  floor          String?    @db.VarChar(10)
+  cabinet        String?    @db.VarChar(10)
+  telegramUserId BigInt?    @unique
+
+  assignedEquipment Equipment[] @relation("AssignedEquipment")
+  requests          Request[]   @relation("UserRequests")
+  assignedRequests  Request[]   @relation("ExecutorRelation")
+  software          Software[]  @relation("UserToSoftware")
+  comments          Comment[]
+  notifications     Notification[]
+}
+
+model Equipment {
+  id               Int        @id @default(autoincrement())
+  inventoryNumber  String     @unique @db.VarChar(50)
+  name             String     @db.VarChar(100)
+  type             String     @db.VarChar(50)
+  macAddress       String?    @db.VarChar(50)
+  ipAddress        String?    @db.VarChar(50)
+  login            String?    @db.VarChar(50)
+  password         String?    @db.VarChar(50)
+  location         String     @db.VarChar(50)
+  floor            String?    @db.VarChar(10)
+  cabinet          String?    @db.VarChar(10)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  fileUrls         String[]   @default([])
+
+  assignedToUserId Int?
+  assignedTo       User?      @relation("AssignedEquipment", fields: [assignedToUserId], references: [id])
+  software         Software[] @relation("EquipmentToSoftware")
+}
+
+model Software {
+  id              Int         @id @default(autoincrement())
+  name            String      @db.VarChar(100)
+  version         String?     @db.VarChar(50)
+  licenseKey      String?     @db.VarChar(255)
+  licensedTo      String?     @db.VarChar(100)
+  adminLogin      String?     @db.VarChar(50)
+  adminPassword   String?     @db.VarChar(50)
+  networkAddress  String?     @db.VarChar(100)
+  floor           String?     @db.VarChar(10)
+  cabinet         String?     @db.VarChar(10)
+  purchaseDate    DateTime?
+  supportStart    DateTime?
+  supportEnd      DateTime?
+  expiryDate      DateTime?
+  fileUrls        String[]    @default([])
+  installDate     DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+
+  users           User[]      @relation("UserToSoftware")
+  equipment       Equipment[] @relation("EquipmentToSoftware")
+}
+
+model Request {
+  id                       Int            @id @default(autoincrement())
+  title                    String         @db.VarChar(100)
+  content                  String
+  status                   RequestStatus  @default(NEW)
+  priority                 Priority       @default(NORMAL)
+  category                 String?        @db.VarChar(50)
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  expectedResolutionDate   DateTime?
+  resolvedAt               DateTime?
+  assignedAt               DateTime?
+  workDuration             Int?
+  source                   RequestSource? @default(WEB)
+
+  userId                   Int
+  user                     User           @relation("UserRequests", fields: [userId], references: [id])
+
+  executorId               Int?
+  executor                 User?          @relation("ExecutorRelation", fields: [executorId], references: [id])
+
+  rating                   Int?
+  feedback                 String?
+  fileUrls                 String[]       @default([])
+
+  comments                 Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  requestId Int
+  request   Request  @relation(fields: [requestId], references: [id])
+
+  @@index([createdAt])
+}
+
+model Notification {
+  id         String     @id @default(uuid())
+  userId     Int?
+  role       Role?
+  department Department? // ✅ добавлено поле для рассылки по отделу
+  title      String
+  message    String
+  type       String
+  url        String?
+  isRead     Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+
+  user       User?      @relation(fields: [userId], references: [id])
+}
+
+model News {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(200)
+  content   String
+  createdAt DateTime @default(now())
+}
