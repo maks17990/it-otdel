@@ -5,10 +5,11 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws'; // Используем ws, не socket.io!
+import { Server, WebSocket } from 'ws';
 
 @WebSocketGateway({
-  namespace: '/admin/logs', // Фронтенд должен подключаться: ws://host:port/admin/logs
+  // "namespace" не поддерживается WsAdapter, используем "path" вместо этого
+  path: '/admin/logs', // Фронтенд подключается: ws://host:port/admin/logs
   cors: {
     origin: '*', // Лучше потом ограничить
     credentials: false,
