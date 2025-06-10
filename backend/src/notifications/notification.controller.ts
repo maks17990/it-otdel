@@ -51,8 +51,13 @@ export class NotificationController {
    * Отметить уведомление как прочитанное.
    */
   @Patch(':id/read')
-  async markAsRead(@Param('id') id: string) {
-    return this.notificationService.markAsRead(id);
+  async markAsRead(@Param('id') id: string, @Req() req: Request) {
+    const user = req.user as any;
+    const userId = user.userId ?? user.id;
+    if (!userId) {
+      throw new UnauthorizedException('Пользователь не авторизован');
+    }
+    return this.notificationService.markAsRead(id, userId);
   }
 
   /**

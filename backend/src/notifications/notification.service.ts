@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationMessage } from './notification.model';
 import { NotificationType, CreateNotificationDto } from './dto/create-notification.dto';
@@ -135,7 +135,29 @@ export class NotificationService {
   /**
    * Отметить уведомление как прочитанное.
    */
-  async markAsRead(id: string) {
+  async markAsRead(id: string, userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true, department: true },
+    });
+    if (!user) throw new NotFoundException('Пользователь не найден');
+
+    const notification = await this.prisma.notification.findUnique({
+      where: { id },
+    });
+    if (!notification) {
+      throw new NotFoundException('Уведомление не найдено');
+    }
+
+    const allowed =
+      notification.userId === userId ||
+      (notification.role && notification.role === user.role) ||
+      (notification.department && notification.department === user.department);
+
+    if (!allowed) {
+      throw new ForbiddenException('Нет доступа к уведомлению');
+    }
+
     return this.prisma.notification.update({
       where: { id },
       data: { isRead: true },
