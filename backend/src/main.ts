@@ -77,7 +77,7 @@ async function bootstrap() {
   const rawOrigins = process.env.FRONTEND_URL;
   const allowedOrigins = rawOrigins
     ? rawOrigins.split(',').map((url) => url.trim())
-     : ['http://localhost:3001', 'http://188.187.212.120:3001'];
+     : ['http://localhost:3001'];
 
   console.log('✅ Разрешённые источники CORS:', allowedOrigins);
 
