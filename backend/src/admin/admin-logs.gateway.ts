@@ -8,7 +8,9 @@ import {
 import { Server, WebSocket } from 'ws'; // Используем ws, не socket.io!
 
 @WebSocketGateway({
-  namespace: '/admin/logs', // Фронтенд должен подключаться: ws://host:port/admin/logs
+  // Используем путь вместо namespace, так как WsAdapter не поддерживает namespace
+  // Клиент подключается по адресу ws://host:port/admin/logs
+  path: '/admin/logs',
   cors: {
     origin: '*', // Лучше потом ограничить
     credentials: false,
