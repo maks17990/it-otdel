@@ -4,6 +4,7 @@ import { AdminService } from './admin.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { TelegramModule } from '../telegram/telegram.module';
 import { AdminLogsGateway } from './admin-logs.gateway'; // ✅ Live-лог Gateway
+import { AuditLogService } from './audit-log.service';
 
 @Module({
   imports: [
@@ -16,10 +17,12 @@ import { AdminLogsGateway } from './admin-logs.gateway'; // ✅ Live-лог Gate
   providers: [
     AdminService,
     AdminLogsGateway, // ✅ Подключаем gateway к провайдерам
+    AuditLogService,
   ],
   exports: [
     AdminService,
     AdminLogsGateway, // ✅ Экспортируй, если лог нужен в других модулях (например, RequestsService)
+    AuditLogService,
   ],
 })
 export class AdminModule {}

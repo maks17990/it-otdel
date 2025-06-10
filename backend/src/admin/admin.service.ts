@@ -1,12 +1,16 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RequestStatus } from '@prisma/client';
+import { AuditLogService } from './audit-log.service';
 
 @Injectable()
 export class AdminService {
   private readonly logger = new Logger(AdminService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLog: AuditLogService,
+  ) {}
 
   /** 📌 Общая статистика: пользователи, оборудование, активные заявки */
   async getStats() {
@@ -156,6 +160,116 @@ export class AdminService {
       this.logger.error('❌ Ошибка при получении активности по часам', error instanceof Error ? error.stack : '');
       throw new InternalServerErrorException('Не удалось получить активность по часам');
     }
+  }
+
+  /** 📅 Статистика по дням за период */
+  async getDailyStats(days = 30) {
+    try {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() - (days - 1));
+
+      const requests = await this.prisma.request.findMany({
+        where: {
+          OR: [
+            { createdAt: { gte: start } },
+            { resolvedAt: { gte: start } },
+          ],
+        },
+        select: {
+          createdAt: true,
+          resolvedAt: true,
+        },
+      });
+
+      const logs = await this.prisma.auditLog.findMany({
+        where: { actionType: 'user_created', createdAt: { gte: start } },
+        select: { createdAt: true },
+      });
+
+      const map: Record<string, { newRequests: number; closedRequests: number; newUsers: number }> = {};
+      for (let i = 0; i < days; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const key = d.toISOString().slice(0, 10);
+        map[key] = { newRequests: 0, closedRequests: 0, newUsers: 0 };
+      }
+
+      for (const r of requests) {
+        const created = r.createdAt.toISOString().slice(0, 10);
+        if (map[created]) map[created].newRequests++;
+        if (r.resolvedAt) {
+          const closed = r.resolvedAt.toISOString().slice(0, 10);
+          if (map[closed]) map[closed].closedRequests++;
+        }
+      }
+
+      for (const l of logs) {
+        const d = l.createdAt.toISOString().slice(0, 10);
+        if (map[d]) map[d].newUsers++;
+      }
+
+      return Object.entries(map).map(([date, { newRequests, closedRequests, newUsers }]) => ({
+        date,
+        newRequests,
+        closedRequests,
+        newUsers,
+      }));
+    } catch (error) {
+      this.logger.error('❌ Ошибка при получении дневной статистики', error instanceof Error ? error.stack : '');
+      throw new InternalServerErrorException('Не удалось получить статистику по дням');
+    }
+  }
+
+  /** 🛠️ Топ устройств по количеству заявок */
+  async getEquipmentFaults(days = 30) {
+    try {
+      // В текущей версии модель Request не содержит связи с Equipment,
+      // поэтому вернём пустой массив как заглушку.
+      return [];
+    } catch (error) {
+      this.logger.error('❌ Ошибка при получении статистики поломок', error instanceof Error ? error.stack : '');
+      throw new InternalServerErrorException('Не удалось получить статистику поломок');
+    }
+  }
+
+  /** 👥 Активные пользователи по дням */
+  async getUsersActivity(days = 30) {
+    try {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      start.setDate(start.getDate() - (days - 1));
+      const logs = await this.prisma.auditLog.findMany({
+        where: { createdAt: { gte: start } },
+        select: { createdAt: true, userId: true },
+      });
+      const map: Record<string, Set<number>> = {};
+      for (let i = 0; i < days; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        map[d.toISOString().slice(0, 10)] = new Set();
+      }
+      for (const l of logs) {
+        const key = l.createdAt.toISOString().slice(0, 10);
+        if (map[key]) {
+          if (l.userId) map[key].add(l.userId);
+        }
+      }
+      return Object.entries(map).map(([date, set]) => ({ date, count: set.size }));
+    } catch (error) {
+      this.logger.error('❌ Ошибка при получении активности пользователей', error instanceof Error ? error.stack : '');
+      throw new InternalServerErrorException('Не удалось получить активность пользователей');
+    }
+  }
+
+  getAuditLogs(filter: {
+    userId?: number;
+    type?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+    entityType?: string;
+  }) {
+    return this.auditLog.getLogs(filter);
   }
 
   /** 📟 Статус оборудования (пинг IP-адресов) */

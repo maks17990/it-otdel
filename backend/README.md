@@ -114,3 +114,10 @@ It pings each device's `ipAddress` and returns an array of objects:
 ```
 
 Use this endpoint from the admin panel to display current status and receive live log updates via the `/admin/logs` WebSocket namespace.
+
+## Additional statistics endpoints
+
+* `GET /admin/stats/daily?days=N` – statistics of new and closed requests and new users for the last `N` days (default 30).
+* `GET /admin/stats/equipment-faults?days=N` – top equipment by number of faults. Currently returns an empty list as requests are not linked with equipment.
+* `GET /admin/stats/users-activity?days=N` – number of active users per day.
+* `GET /admin/audit-log` – query audit log. Supports parameters: `userId`, `type`, `dateFrom`, `dateTo`, `entityType`.

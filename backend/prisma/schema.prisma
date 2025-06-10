@@ -97,6 +97,7 @@ model User {
   software          Software[]  @relation("UserToSoftware")
   comments          Comment[]
   notifications     Notification[]
+  auditLogs        AuditLog[]
 }
 
 model Equipment {
@@ -205,4 +206,17 @@ model News {
   title     String   @db.VarChar(200)
   content   String
   createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  user       User?    @relation(fields: [userId], references: [id])
+  actionType String
+  entityType String
+  entityId   Int?
+  params     Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
 }

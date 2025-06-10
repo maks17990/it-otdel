@@ -76,6 +76,40 @@ export class AdminController {
     return this.adminService.getHourlyActivity();
   }
 
+  @Get('stats/daily')
+  @Roles('admin', 'superuser')
+  async getDailyStats(@Req() req) {
+    const days = parseInt(req.query.days) || 30;
+    return this.adminService.getDailyStats(days);
+  }
+
+  @Get('stats/equipment-faults')
+  @Roles('admin', 'superuser')
+  async getEquipmentFaults(@Req() req) {
+    const days = parseInt(req.query.days) || 30;
+    return this.adminService.getEquipmentFaults(days);
+  }
+
+  @Get('stats/users-activity')
+  @Roles('admin', 'superuser')
+  async getUsersActivity(@Req() req) {
+    const days = parseInt(req.query.days) || 30;
+    return this.adminService.getUsersActivity(days);
+  }
+
+  @Get('audit-log')
+  @Roles('admin', 'superuser')
+  async getAuditLog(@Req() req) {
+    const { userId, type, dateFrom, dateTo, entityType } = req.query;
+    return this.adminService.getAuditLogs({
+      userId: userId ? parseInt(userId) : undefined,
+      type: type as string,
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(dateTo) : undefined,
+      entityType: entityType as string,
+    });
+  }
+
   @Get('monitoring')
   @Roles('admin', 'superuser')
   async getMonitoring() {

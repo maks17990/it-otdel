@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { AuditLogService } from '../admin/audit-log.service';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 
@@ -16,6 +17,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly auditLog: AuditLogService,
   ) {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
@@ -80,6 +82,13 @@ export class AuthService {
     });
 
     console.log(`[AuthService] Пользователь ${user.id} вошёл, токен установлен в cookie`);
+
+    await this.auditLog.create({
+      userId: user.id,
+      actionType: 'login',
+      entityType: 'user',
+      entityId: user.id,
+    });
 
     return {
       id: user.id,
