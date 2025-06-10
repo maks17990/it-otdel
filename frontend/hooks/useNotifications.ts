@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
@@ -12,7 +13,7 @@ export type Notification = {
   isRead: boolean;
 };
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, 'ws') ?? '';
+const SOCKET_URL = getApiBase().replace(/^http/, 'ws');
 
 export function useNotifications(userId: number, role: string) {
   const [notifications, setNotifications] = useState<Notification[]>([]);

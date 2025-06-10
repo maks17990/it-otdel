@@ -1,4 +1,6 @@
 "use client";
+import { getApiBase } from "@/utils/apiBase";
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -74,7 +76,7 @@ interface RequestItem {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const API_URL = getApiBase();
   const [token, setToken] = useState<string | null>(null);
 
   const [stats, setStats] = useState<Record<StatsKey, number>>({ users: 0, equipment: 0, requests: 0, telegram: 0 });

@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import io from 'socket.io-client';
 
@@ -15,7 +16,7 @@ export function connectSocket(userId: number, role: string): SocketType {
   }
 
   if (!socket) {
-    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, 'ws') || '';
+    const SOCKET_URL = getApiBase().replace(/^http/, 'ws');
     socket = io(SOCKET_URL, {
       query: { userId: String(userId), role },
     });

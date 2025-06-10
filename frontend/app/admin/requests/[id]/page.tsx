@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
@@ -81,7 +82,7 @@ export default function AdminRequestPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [showAllComments, setShowAllComments] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseUrl = getApiBase();
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const [priority, setPriority] = useState<'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'>('NORMAL');

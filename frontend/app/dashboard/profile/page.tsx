@@ -1,4 +1,5 @@
 "use client";
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -36,7 +37,7 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const API_URL = getApiBase();
 
   useEffect(() => {
     if (!token) return router.push('/login');

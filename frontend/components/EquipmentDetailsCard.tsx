@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,7 +10,7 @@ interface Props {
   onUserClick?: (userId: number) => void;
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+const apiBase = getApiBase();
 
 export default function EquipmentDetailsCard({ details, onUserClick }: Props) {
   const {

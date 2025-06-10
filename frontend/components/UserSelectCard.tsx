@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
@@ -33,8 +34,8 @@ export default function UserSelectCard({
 
   useEffect(() => {
     const url = filterRole
-      ? `${process.env.NEXT_PUBLIC_API_URL || ''}/users?role=${encodeURIComponent(filterRole)}`
-      : `${process.env.NEXT_PUBLIC_API_URL || ''}/users`;
+      ? `${getApiBase()}/users?role=${encodeURIComponent(filterRole)}`
+      : `${getApiBase()}/users`;
 
     fetch(url, {
       headers: {

@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useState } from 'react';
 import { FaFilePdf, FaFileImage, FaFileAlt, FaTimes } from 'react-icons/fa';
@@ -10,7 +11,7 @@ interface Props {
   onUserClick?: (userId: number) => void;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const baseUrl = getApiBase();
 
 export default function SoftwareDetailsCard({ software, onClose, onUserClick }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

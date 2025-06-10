@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState } from 'react';
 
@@ -51,7 +52,7 @@ export default function UserEditForm({ user, onUpdate, isOpen = true, onClose }:
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/users/update-profile`,
+        `${getApiBase()}/users/update-profile`,
         {
           method: 'PUT',
           credentials: 'include',

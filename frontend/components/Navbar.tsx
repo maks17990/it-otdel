@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -9,7 +10,7 @@ interface NavbarProps {
   currentPage: 'profile' | 'news' | 'instructions' | 'requests' | 'dashboard';
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL;
+const apiBase = getApiBase();
 
 export default function Navbar({ user, currentPage }: NavbarProps) {
   const router = useRouter();

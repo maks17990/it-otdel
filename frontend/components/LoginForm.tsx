@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ export default function LoginForm() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const API_URL = getApiBase();
 
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',

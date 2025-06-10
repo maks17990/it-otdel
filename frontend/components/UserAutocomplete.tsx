@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useEffect, useState, useRef } from 'react';
 import { User } from '@/types/user';
@@ -31,7 +32,7 @@ export default function UserAutocomplete({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+        const res = await fetch(`${getApiBase()}/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

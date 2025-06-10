@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import Navbar from '@/components/Navbar';
@@ -153,7 +154,7 @@ export default function RequestDetailsPage() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<Status | null>(null);
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseUrl = getApiBase();
   const userRole = useUserRole?.() || {};
   const { isAdmin, role, user } = userRole as any;
   const canAssignExecutor = isAdmin || role === 'superuser';

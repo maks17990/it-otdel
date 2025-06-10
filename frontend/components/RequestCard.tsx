@@ -1,4 +1,5 @@
 "use client";
+import { getApiBase } from "@/utils/apiBase";
 
 import React from 'react';
 import { Repeat2 } from 'lucide-react';
@@ -54,7 +55,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function RequestCard({ request, onRepeat }: RequestCardProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const baseUrl = getApiBase();
   const isClosed = request.status === 'COMPLETED' || request.status === 'DONE';
 
   return (

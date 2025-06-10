@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +15,7 @@ import { Equipment, EquipmentDetails } from '@/types/equipment';
 
 export default function AdminSoftwarePage() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const API_URL = getApiBase();
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const [softwareList, setSoftwareList] = useState<SoftwareDetails[]>([]);

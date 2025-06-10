@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,7 @@ const departmentLabels: Record<string, string> = {
   HEALTH_CENTER: 'Центр здоровья',
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = getApiBase();
 
 export default function RegisterForm() {
   const [loading, setLoading] = useState(false);

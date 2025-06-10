@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getApiBase } from "@/utils/apiBase";
 import { User } from '../types/user';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ export default function AssignExecutorModal({
   const [selectedExecutorId, setSelectedExecutorId] = useState<number | null>(currentExecutorId ?? null);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const API_BASE = getApiBase();
 
   useEffect(() => {
     if (isOpen) {

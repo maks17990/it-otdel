@@ -1,11 +1,12 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Bell, UserCircle2, LogOut } from 'lucide-react';
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL;
+const apiBase = getApiBase();
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');

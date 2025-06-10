@@ -1,4 +1,5 @@
 "use client";
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
@@ -26,7 +27,7 @@ interface UserForm {
   telegramUserId?: string;
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL;
+const apiBase = getApiBase();
 
 const getHeaders = () => {
   const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;

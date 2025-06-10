@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { PRIORITY_LABELS } from '../utils/constants';
@@ -40,8 +41,8 @@ function decodeJwtPayload(token: string): DecodedTokenPayload {
   return JSON.parse(atob(base64));
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, 'ws') ?? '';
+const apiBase = getApiBase();
+const SOCKET_URL = getApiBase()?.replace(/^http/, 'ws') ?? '';
 
 export default function NewRequestModal({ onClose, onCreated, initialState }: NewRequestModalProps) {
   const [form, setForm] = useState({

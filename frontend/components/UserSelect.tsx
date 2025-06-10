@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { User } from '@/types/user';
@@ -30,7 +31,7 @@ export default function UserSelectCard({
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+        const res = await fetch(`${getApiBase()}/api/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
           },

@@ -1,4 +1,5 @@
 "use client";
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
@@ -51,7 +52,7 @@ export default function AdminEquipmentPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/equipment`,
+        `${getApiBase()}/equipment`,
         {
           credentials: "include",
           headers: getAuthHeaders(),
@@ -71,7 +72,7 @@ export default function AdminEquipmentPage() {
   const fetchUsers = useCallback(async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users`,
+        `${getApiBase()}/users`,
         {
           credentials: "include",
           headers: getAuthHeaders(),
@@ -90,7 +91,7 @@ export default function AdminEquipmentPage() {
     async (id: number) => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/equipment/${id}`,
+          `${getApiBase()}/equipment/${id}`,
           {
             credentials: "include",
             headers: getAuthHeaders(),
@@ -111,7 +112,7 @@ export default function AdminEquipmentPage() {
     async (userId: number) => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/details/${userId}`,
+          `${getApiBase()}/users/details/${userId}`,
           {
             credentials: "include",
             headers: getAuthHeaders(),
@@ -132,7 +133,7 @@ export default function AdminEquipmentPage() {
       if (!confirm("Удалить это оборудование?")) return;
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/equipment/${id}`,
+          `${getApiBase()}/equipment/${id}`,
           {
             method: "DELETE",
             credentials: "include",
@@ -163,8 +164,8 @@ export default function AdminEquipmentPage() {
     e.preventDefault();
     const method = isEdit ? "PUT" : "POST";
     const url = isEdit
-      ? `${process.env.NEXT_PUBLIC_API_URL}/equipment/${editId}`
-      : `${process.env.NEXT_PUBLIC_API_URL}/equipment`;
+      ? `${getApiBase()}/equipment/${editId}`
+      : `${getApiBase()}/equipment`;
 
     try {
       const res = await fetch(url, {
@@ -189,7 +190,7 @@ export default function AdminEquipmentPage() {
           const formData = new FormData();
           formData.append("file", file);
           await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/equipment/${eqId}/upload`,
+            `${getApiBase()}/equipment/${eqId}/upload`,
             {
               method: "POST",
               body: formData,

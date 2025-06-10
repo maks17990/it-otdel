@@ -1,4 +1,5 @@
 'use client';
+import { getApiBase } from "@/utils/apiBase";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -50,7 +51,7 @@ export default function Home() {
   // Функция для получения рейтинга текущего админа
   const fetchAdminRating = async (adminId: number, token: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const apiUrl = getApiBase();
       const res = await fetch(`${apiUrl}/requests/assigned`, {
         headers: { Authorization: `Bearer ${token}` },
       });
