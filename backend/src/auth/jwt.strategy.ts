@@ -35,7 +35,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    console.log('✅ JWT Payload:', payload);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ JWT Payload:', payload);
+    }
 
     if (
       !payload?.sub ||
