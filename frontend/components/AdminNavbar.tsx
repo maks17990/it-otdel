@@ -125,10 +125,13 @@ export default function AdminNavbar() {
               </>
             )}
           </button>
-          <div className="flex items-center gap-2 text-sm text-cyan-100/80 px-2 py-1 rounded-full select-none">
+          <button
+            onClick={() => router.push('/admin/profile')}
+            className="flex items-center gap-2 text-sm text-cyan-100/80 px-2 py-1 rounded-full select-none"
+          >
             <UserCircle2 className="w-5 h-5" />
             {loading ? 'Загрузка...' : adminName}
-          </div>
+          </button>
           <button
             onClick={handleLogout}
             className="flex items-center gap-1 text-cyan-100 hover:text-pink-400 transition px-2 py-1 rounded-full text-sm font-semibold"
