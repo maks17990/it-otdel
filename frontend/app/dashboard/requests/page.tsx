@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,6 +10,11 @@ import RequestFilters from '@/components/RequestFilters';
 import { motion } from 'framer-motion';
 import { BarChart2, RefreshCw, FileDown, PlusCircle } from 'lucide-react';
 import { CSVLink } from 'react-csv';
+
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
 
 // ✅ Функция безопасного декодирования UTF-8 JWT
 function decodeJwtPayload(token: string) {
@@ -26,7 +32,7 @@ function decodeJwtPayload(token: string) {
   }
 }
 
-// Закрытые статусы (не отображать по умолчанию)
+// Закрытые статусы
 const CLOSED_STATUSES = ['DONE', 'COMPLETED'];
 
 export default function MyRequestsPage() {
@@ -54,7 +60,6 @@ export default function MyRequestsPage() {
   });
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   useEffect(() => {
     if (!token) {
@@ -96,16 +101,13 @@ export default function MyRequestsPage() {
     setShowModal(true);
   };
 
-  // Фильтрация: скрываем закрытые статусы, если не выбран фильтр по закрытому статусу
   const filteredRequests = requests.filter((r) => {
     const matchTitle = !filterTitle || r.title.toLowerCase().includes(filterTitle.toLowerCase());
     const matchPriority = !filterPriority || r.priority === filterPriority;
     const matchCategory = !filterCategory || r.category === filterCategory;
     const matchDate = !filterDate || r.createdAt.startsWith(filterDate);
 
-    // Если фильтр по статусу не выбран
     if (!filterStatus) {
-      // По умолчанию скрываем закрытые статусы
       return (
         !CLOSED_STATUSES.includes(r.status) &&
         matchTitle &&
@@ -114,7 +116,6 @@ export default function MyRequestsPage() {
         matchDate
       );
     } else {
-      // Если пользователь фильтрует по какому-либо статусу
       return (
         r.status === filterStatus &&
         matchTitle &&
@@ -128,8 +129,9 @@ export default function MyRequestsPage() {
   const stats = {
     total: requests.length,
     active: requests.filter((r) => r.status === 'IN_PROGRESS').length,
-    resolved: requests.filter((r) => r.status === 'RESOLVED' || r.status === 'DONE' || r.status === 'COMPLETED').length,
-    // averageRating: больше не нужен!
+    resolved: requests.filter((r) =>
+      ['RESOLVED', 'DONE', 'COMPLETED'].includes(r.status)
+    ).length,
   };
 
   const csvData = requests.map((r) => ({
@@ -147,7 +149,6 @@ export default function MyRequestsPage() {
       <Navbar user={user} currentPage="requests" />
       <div className="min-h-screen bg-gradient-to-br from-[#131827] via-[#18243c] to-[#19243a] text-white px-3 md:px-7 py-10">
         <div className="max-w-7xl mx-auto">
-          {/* Шапка + Экшены */}
           <div className="flex flex-col sm:flex-row sm:justify-between items-center mb-8 gap-4">
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3 drop-shadow">
               <BarChart2 className="text-cyan-400 w-8 h-8" />
@@ -170,15 +171,12 @@ export default function MyRequestsPage() {
             </div>
           </div>
 
-          {/* Статы (убрали средний рейтинг) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-10">
             <StatsCard icon={<BarChart2 className="text-cyan-400 w-6 h-6" />} label="Всего" value={stats.total} />
             <StatsCard icon={<RefreshCw className="text-yellow-400 w-6 h-6" />} label="В работе" value={stats.active} />
             <StatsCard icon={<BarChart2 className="text-green-400 w-6 h-6" />} label="Решено" value={stats.resolved} />
-            {/* <StatsCard ... />  рейтинг убран */}
           </div>
 
-          {/* Фильтры */}
           <details className="mb-7">
             <summary className="cursor-pointer text-cyan-300 hover:text-cyan-200 text-lg font-semibold transition">🔍 Фильтры</summary>
             <div className="mt-4 bg-white/5 p-4 rounded-xl shadow border border-cyan-200/10">
@@ -200,7 +198,6 @@ export default function MyRequestsPage() {
           {loading && <p className="text-white/60">Загрузка...</p>}
           {error && <p className="text-red-400">{error}</p>}
 
-          {/* Карточки заявок */}
           <div className="space-y-4">
             {filteredRequests.length === 0 && !loading && !error ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-white/50 italic">
@@ -249,3 +246,4 @@ function StatsCard({ icon, label, value }: { icon: React.ReactNode; label: strin
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+
 'use client';
 
 export default function SkeletonCard() {
@@ -36,3 +37,15 @@ export default function SkeletonCard() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,14 @@
+
 'use client';
 
 import { useState } from 'react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 export interface SoftwareItem {
   id: number;
@@ -130,3 +138,21 @@ export default function SoftwareTable({ data, onEdit, onDelete }: SoftwareTableP
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -5,6 +6,13 @@ import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useNotifications } from '@/hooks/useNotifications';
 import { motion, AnimatePresence } from 'framer-motion';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 export function NotificationBell({ userId, role }: { userId: number; role: string }) {
   const [showList, setShowList] = useState(false);
@@ -91,3 +99,21 @@ export function NotificationBell({ userId, role }: { userId: number; role: strin
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

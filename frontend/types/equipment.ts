@@ -1,3 +1,4 @@
+
 // frontend/types/equipment.ts
 
 export interface EquipmentDetails {
@@ -29,3 +30,15 @@ export interface Equipment {
   name: string;
   inventoryNumber: string;
 }
+
+
+
+
+
+
+
+
+
+
+
+

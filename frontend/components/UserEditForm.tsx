@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 interface User {
   firstName: string;
   lastName: string;
@@ -21,7 +26,12 @@ interface UserEditFormProps {
   onClose?: () => void;  // Если нужен режим модалки
 }
 
-export default function UserEditForm({ user, onUpdate, isOpen = true, onClose }: UserEditFormProps) {
+export default function UserEditForm({
+  user,
+  onUpdate,
+  isOpen = true,
+  onClose,
+}: UserEditFormProps) {
   const [formData, setFormData] = useState<User>({ ...user });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -51,7 +61,7 @@ export default function UserEditForm({ user, onUpdate, isOpen = true, onClose }:
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/users/update-profile`,
+        `${API_URL}/users/update-profile`,
         {
           method: 'PUT',
           credentials: 'include',

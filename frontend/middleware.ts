@@ -8,20 +8,22 @@ interface JwtPayload {
 }
 
 export function middleware(request: NextRequest) {
+  // Достаём токен из cookies (!!!)
   const token = request.cookies.get('token')?.value;
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
   if (!token) {
+    // Если нет токена, пропускаем дальше (или можно редирект на /login)
     return NextResponse.next();
   }
 
   try {
     const decoded = jwtDecode<JwtPayload>(token);
-
     const now = Math.floor(Date.now() / 1000);
 
     if (decoded.exp && decoded.exp < now) {
+      // Токен протух — чистим и редиректим на /login
       const res = NextResponse.redirect(new URL('/login', request.url));
       res.cookies.set('token', '', {
         path: '/',
@@ -52,6 +54,7 @@ export function middleware(request: NextRequest) {
 
     return NextResponse.next();
   } catch (err) {
+    // Ошибка декодирования токена — чистим куку и редиректим на /login
     const res = NextResponse.redirect(new URL('/login', request.url));
     res.cookies.set('token', '', {
       path: '/',

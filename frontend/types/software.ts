@@ -1,5 +1,13 @@
+
 import { User } from './user';
 import { Equipment } from './equipment';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 // Используется при создании/редактировании формы
 export interface SoftwareFormData {
@@ -44,3 +52,21 @@ export interface SoftwareDetails {
   users?: User[];
   equipment?: Equipment[];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

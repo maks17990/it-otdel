@@ -1,9 +1,12 @@
-// frontend/components/ui/button.tsx
+
 'use client';
 
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
-
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+  
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   className?: string;
@@ -59,3 +62,21 @@ export function Button({
     </button>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

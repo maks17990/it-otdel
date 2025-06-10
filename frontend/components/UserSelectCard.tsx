@@ -1,7 +1,15 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface User {
   id: number;
@@ -164,3 +172,21 @@ export default function UserSelectCard({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

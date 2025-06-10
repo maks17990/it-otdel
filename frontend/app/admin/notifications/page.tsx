@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,6 +6,9 @@ import axios from 'axios';
 import AdminNavbar from '@/components/AdminNavbar';
 import { Bell, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
 
 interface Notification {
   id: string;
@@ -131,3 +135,21 @@ export default function AdminNotificationsPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,13 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 export const metadata: Metadata = {
   title: 'IT Отдел',
@@ -35,3 +43,21 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

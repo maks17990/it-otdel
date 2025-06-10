@@ -3,6 +3,13 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Bell, UserCircle, LogOut } from 'lucide-react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface NavbarProps {
   user: any;
@@ -99,3 +106,21 @@ export default function Navbar({ user, currentPage }: NavbarProps) {
     </nav>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

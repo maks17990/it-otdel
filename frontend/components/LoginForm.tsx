@@ -1,9 +1,14 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -12,7 +17,7 @@ export default function LoginForm() {
   const router = useRouter();
 
   useEffect(() => {
-    // Для дебага: console.log('[DEBUG] Текущий токен в localStorage:', localStorage.getItem('token'));
+    // console.log('[DEBUG] Текущий токен в localStorage:', localStorage.getItem('token'));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,8 +36,6 @@ export default function LoginForm() {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,6 +51,7 @@ export default function LoginForm() {
       if (!data.role || !data.access_token) {
         throw new Error('Не удалось получить токен или роль');
       }
+
       const role = data.role.toUpperCase();
 
       localStorage.setItem('token', data.access_token);
@@ -94,7 +98,7 @@ export default function LoginForm() {
 
       <div className="relative">
         <input
-          type={showPassword ? "text" : "password"}
+          type={showPassword ? 'text' : 'password'}
           name="password"
           autoComplete="current-password"
           placeholder="Пароль"
@@ -107,7 +111,7 @@ export default function LoginForm() {
           tabIndex={-1}
           className="absolute top-1/2 right-4 -translate-y-1/2 text-cyan-300 hover:text-cyan-100 transition"
           onClick={() => setShowPassword(v => !v)}
-          aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+          aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
         >
           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
         </button>
@@ -124,9 +128,11 @@ export default function LoginForm() {
             Вход...
           </>
         ) : (
-          "Войти"
+          'Войти'
         )}
       </button>
     </form>
   );
 }
+
+

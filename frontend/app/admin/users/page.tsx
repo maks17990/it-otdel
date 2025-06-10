@@ -1,4 +1,5 @@
-"use client";
+
+'use client';
 
 import { useEffect, useState } from 'react';
 import AdminNavbar from '@/components/AdminNavbar';
@@ -7,7 +8,12 @@ import UserDetailsCard from '@/components/UserDetailsCard';
 import EquipmentDetailsCard from '@/components/EquipmentDetailsCard';
 import { User, UserDetails } from '@/types/user';
 import { EquipmentDetails } from '@/types/equipment';
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
+
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
 
 interface UserForm {
   lastName: string;
@@ -26,10 +32,8 @@ interface UserForm {
   telegramUserId?: string;
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL;
-
 const getHeaders = () => {
-  const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -66,8 +70,7 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      if (!apiBase) throw new Error("NEXT_PUBLIC_API_URL не определён");
-      const res = await fetch(`${apiBase}/users`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/users`, { headers: getHeaders() });
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -80,8 +83,7 @@ export default function AdminUsersPage() {
 
   const viewDetails = async (id: number) => {
     try {
-      if (!apiBase) throw new Error("NEXT_PUBLIC_API_URL не определён");
-      const res = await fetch(`${apiBase}/users/details/${id}`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/users/details/${id}`, { headers: getHeaders() });
       const data = await res.json();
       setDetails(data);
       setEquipmentDetails(null);
@@ -92,8 +94,7 @@ export default function AdminUsersPage() {
 
   const handleEquipmentClick = async (equipmentId: number) => {
     try {
-      if (!apiBase) throw new Error("NEXT_PUBLIC_API_URL не определён");
-      const res = await fetch(`${apiBase}/equipment/${equipmentId}`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/equipment/${equipmentId}`, { headers: getHeaders() });
       const data = await res.json();
       setEquipmentDetails(data);
     } catch (err) {
@@ -103,8 +104,7 @@ export default function AdminUsersPage() {
 
   const handleEditById = async (id: number) => {
     try {
-      if (!apiBase) throw new Error("NEXT_PUBLIC_API_URL не определён");
-      const res = await fetch(`${apiBase}/users/details/${id}`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/users/details/${id}`, { headers: getHeaders() });
       const user = await res.json();
 
       setForm({
@@ -115,17 +115,18 @@ export default function AdminUsersPage() {
         position: user.position ?? '',
         role: user.role ?? 'user',
         mobilePhone: user.mobilePhone ?? '',
-        internalPhone: typeof user.internalPhone === 'string'
-          ? user.internalPhone
-          : (user.internalPhone !== undefined && user.internalPhone !== null ? String(user.internalPhone) : ''),
+        internalPhone:
+          typeof user.internalPhone === 'string'
+            ? user.internalPhone
+            : user.internalPhone !== undefined && user.internalPhone !== null
+            ? String(user.internalPhone)
+            : '',
         floor: user.floor ?? '',
         cabinet: user.cabinet ?? '',
         snils: user.snils ?? '',
-        birthDate: user.birthDate
-          ? user.birthDate.slice(0, 10) // форматируем к "YYYY-MM-DD" для input[type="date"]
-          : '',
+        birthDate: user.birthDate ? user.birthDate.slice(0, 10) : '',
         telegramUserId: user.telegramUserId ?? '',
-        password: '', // поле всегда пустое для формы редактирования!
+        password: '',
       });
 
       setEditUserId(user.id);
@@ -137,10 +138,9 @@ export default function AdminUsersPage() {
 
   const handleUpdate = async (data: UserForm) => {
     const isEdit = !!editUserId;
-    const url = isEdit ? `${apiBase}/users/${editUserId}` : `${apiBase}/users`;
+    const url = isEdit ? `${API_URL}/users/${editUserId}` : `${API_URL}/users`;
     const method = isEdit ? 'PUT' : 'POST';
 
-    // Готовим объект для отправки: не отправляем пустой пароль, если его не меняли!
     const body: any = { ...data, internalPhone: data.internalPhone === '' ? null : data.internalPhone };
     if (isEdit && !body.password) delete body.password;
 
@@ -167,8 +167,7 @@ export default function AdminUsersPage() {
   const deleteUser = async (id: number) => {
     if (!confirm('Вы уверены, что хотите удалить пользователя?')) return;
     try {
-      if (!apiBase) throw new Error("NEXT_PUBLIC_API_URL не определён");
-      const res = await fetch(`${apiBase}/users/${id}`, {
+      const res = await fetch(`${API_URL}/users/${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
@@ -186,14 +185,13 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#13151e] via-[#182232] to-[#212e43] text-white pt-20 px-3 md:px-10 py-10 space-y-10">
       <AdminNavbar />
 
-      {!apiBase && (
+      {!API_URL && (
         <div className="p-4 mb-4 bg-pink-500/20 text-pink-300 rounded-2xl font-bold">
           Ошибка конфигурации: переменная окружения <b>NEXT_PUBLIC_API_URL</b> не задана!
         </div>
@@ -248,12 +246,6 @@ export default function AdminUsersPage() {
                   Загрузка пользователей...
                 </td>
               </tr>
-            ) : !Array.isArray(users) ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-pink-400">
-                  Ошибка: некорректный формат данных пользователей!
-                </td>
-              </tr>
             ) : users.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-white/50">
@@ -300,15 +292,7 @@ export default function AdminUsersPage() {
       </motion.div>
 
       <UserFormModal
-        user={{
-          ...form,
-          birthDate: form.birthDate ?? '',
-          internalPhone: form.internalPhone ?? '',
-          middleName: form.middleName ?? '',
-          role: form.role ?? 'user',
-          floor: form.floor ?? '',
-          cabinet: form.cabinet ?? '',
-        }}
+        user={{ ...form }}
         onUpdate={handleUpdate}
         isOpen={isModalOpen}
         onClose={() => {
@@ -323,3 +307,5 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
+

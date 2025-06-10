@@ -1,8 +1,16 @@
+
 'use client';
 
 import Link from 'next/link';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Bell } from 'lucide-react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 export function NotificationList({ userId, role }: { userId: number; role: string }) {
   const { notifications, markAsRead } = useNotifications(userId, role);
@@ -48,3 +56,21 @@ export function NotificationList({ userId, role }: { userId: number; role: strin
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

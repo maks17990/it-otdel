@@ -3,6 +3,9 @@
 import { useEffect, useRef } from 'react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
 
 interface User {
   id: number;
@@ -180,3 +183,21 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(function 
     </div>
   );
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

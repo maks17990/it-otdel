@@ -14,7 +14,7 @@ declare module 'react-csv' {
     onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
     asyncOnClick?: boolean;
     id?: string;
-    children?: React.ReactNode; // 👈 ЭТО добавлено
+    children?: React.ReactNode;
   }
 
   export const CSVLink: React.FC<CSVLinkProps>;

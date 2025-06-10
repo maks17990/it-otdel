@@ -3,6 +3,10 @@ import { User } from '../types/user';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+
 interface AssignExecutorModalProps {
   requestId: number;
   isOpen: boolean;
@@ -22,11 +26,9 @@ export default function AssignExecutorModal({
   const [selectedExecutorId, setSelectedExecutorId] = useState<number | null>(currentExecutorId ?? null);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
   useEffect(() => {
     if (isOpen) {
-      fetch(`${API_BASE}/users`, {
+      fetch(`${API_URL}/users`, {
         credentials: 'include',
       })
         .then(res => {
@@ -44,16 +46,15 @@ export default function AssignExecutorModal({
           alert('Не удалось загрузить список пользователей. Проверьте авторизацию.');
         });
     }
-    // Сброс выбора при каждом открытии
     if (isOpen) setSelectedExecutorId(currentExecutorId ?? null);
-  }, [isOpen, API_BASE, currentExecutorId]);
+  }, [isOpen, currentExecutorId]);
 
   const handleAssign = async () => {
     if (!selectedExecutorId) return;
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/requests/${requestId}`, {
+      const res = await fetch(`${API_URL}/requests/${requestId}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
@@ -82,13 +83,10 @@ export default function AssignExecutorModal({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center"
         >
-          {/* Glass-фон */}
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"
             onClick={onClose}
           />
-
-          {/* Модальное окно */}
           <motion.div
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -142,3 +140,5 @@ export default function AssignExecutorModal({
     </AnimatePresence>
   );
 }
+
+

@@ -1,8 +1,16 @@
+
 'use client';
 
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
 import React from 'react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface TileCardProps {
   title: string;
@@ -60,3 +68,21 @@ export default function TileCard({
     </Link>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

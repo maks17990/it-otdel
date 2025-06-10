@@ -1,6 +1,14 @@
+
 'use client';
 
 import io from 'socket.io-client';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 type SocketType = ReturnType<typeof io>;
 
@@ -40,3 +48,21 @@ export function disconnectSocket(): void {
     socket = null;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

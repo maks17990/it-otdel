@@ -6,6 +6,15 @@ import AssignExecutorModal from '@/components/AssignExecutorModal';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useRouter, useParams } from 'next/navigation';
 
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+const [token, setToken] = useState<string | null>(null);
+
+useEffect(() => {
+  const storedToken = localStorage.getItem('token');
+  if (storedToken) setToken(storedToken);
+}, []);
+
 // --- Типы и константы ---
 type Priority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
 type Status = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED' | 'COMPLETED';
@@ -159,11 +168,11 @@ export default function RequestDetailsPage() {
   const [pendingRating, setPendingRating] = useState<number | null>(null);
   const [pendingFeedback, setPendingFeedback] = useState<string>('');
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  
   const userRole = useUserRole?.() || {};
   const { isAdmin, role, user } = userRole as any;
   const canAssignExecutor = isAdmin || role === 'superuser';
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
   const canEdit = true;
 
   // Только эти доступны для выбора пользователем
@@ -171,7 +180,7 @@ export default function RequestDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`${baseUrl}/requests/${id}`, {
+    fetch(`${API_URL}/requests/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.ok ? res.json() : Promise.reject('Ошибка загрузки'))
@@ -421,7 +430,7 @@ export default function RequestDetailsPage() {
               ) : (
                 <div className="flex flex-wrap gap-3 mt-2">
                   {fileUrls.map((url, idx) => {
-                    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+                    const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
                     return (
                       <a
                         key={idx}
@@ -558,7 +567,7 @@ export default function RequestDetailsPage() {
         onClose={() => setExecutorModalOpen(false)}
         onAssign={async () => {
           setExecutorModalOpen(false);
-          const res = await fetch(`${baseUrl}/requests/${request.id}`, {
+          const res = await fetch(`${API_URL}/requests/${request.id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -578,3 +587,19 @@ export default function RequestDetailsPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

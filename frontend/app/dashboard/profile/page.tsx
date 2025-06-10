@@ -1,4 +1,5 @@
-"use client";
+
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -18,12 +19,16 @@ import toast, { Toaster } from 'react-hot-toast';
 import QRCode from 'react-qr-code';
 import html2canvas from 'html2canvas';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 const departmentLabels: Record<string, string> = {
   AHO: 'Административно-хозяйственная часть',
   ADMIN: 'Администрация',
   STATIONAR: 'Дневной стационар',
   HEALTH_CENTER: 'Центр здоровья'
-  // ... остальные отделы
 };
 
 export default function ProfilePage() {
@@ -34,9 +39,7 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const qrRef = useRef<HTMLDivElement | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
-
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   useEffect(() => {
     if (!token) return router.push('/login');
@@ -125,7 +128,6 @@ export default function ProfilePage() {
       <Navbar user={user} currentPage="profile" />
       <div className="min-h-screen bg-gradient-to-br from-[#13151e] via-[#182232] to-[#212e43] text-white px-3 md:px-10 py-10">
         <div className="max-w-4xl mx-auto">
-          {/* Hero */}
           <div className="flex flex-col items-center mb-14">
             <div className="relative w-32 h-32 mx-auto mb-5 rounded-full overflow-hidden border-4 border-cyan-400/80 shadow-2xl bg-white/10 backdrop-blur">
               <img
@@ -154,7 +156,6 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* Info cards */}
           <div className="grid md:grid-cols-3 gap-6">
             <InfoCard label="Дата рождения" icon={<CalendarDays className="w-5 h-5 text-cyan-300" />}>
               {user.birthDate ? new Date(user.birthDate).toLocaleDateString('ru-RU') : '—'}
@@ -176,7 +177,6 @@ export default function ProfilePage() {
             </InfoCard>
           </div>
 
-          {/* Last login */}
           <div className="mt-10 bg-white/10 border border-cyan-200/10 rounded-2xl p-5 shadow-xl text-center max-w-md mx-auto">
             <p className="text-sm text-cyan-100/60 flex items-center gap-2 justify-center mb-2">
               <Clock4 className="w-5 h-5 text-cyan-300" /> Последний вход
@@ -191,7 +191,6 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* Actions */}
           <div className="mt-10 text-center flex justify-center gap-4 flex-wrap">
             <button
               onClick={() => toast('Редактирование пока отключено')}
@@ -207,7 +206,6 @@ export default function ProfilePage() {
             </button>
           </div>
 
-          {/* QR Modal */}
           {showQR && (
             <div className="mt-8 flex flex-col items-center gap-2" ref={qrRef}>
               <div className="bg-white/5 p-4 rounded-2xl border border-cyan-300/20">
@@ -251,3 +249,4 @@ function InfoCard({
     </div>
   );
 }
+

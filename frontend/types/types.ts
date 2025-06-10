@@ -1,3 +1,4 @@
+
 // frontend/types/types.ts
 
 export type Priority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
@@ -36,3 +37,15 @@ export interface Request {
   executor?: Executor | null;
   comments: RequestComment[];
 }
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EquipmentDetails } from '@/types/equipment';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface Props {
   details: EquipmentDetails;
@@ -193,3 +200,21 @@ function InfoItem({
     </li>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

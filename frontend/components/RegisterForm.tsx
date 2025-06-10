@@ -1,9 +1,17 @@
+
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, User, Lock, Phone, Building2, Calendar, Hash } from 'lucide-react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 const departmentLabels: Record<string, string> = {
   AHO: 'Административно-хозяйственная часть',
@@ -41,7 +49,7 @@ const departmentLabels: Record<string, string> = {
   HEALTH_CENTER: 'Центр здоровья',
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 
 export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -200,3 +208,21 @@ export default function RegisterForm() {
     </form>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

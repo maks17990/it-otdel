@@ -1,7 +1,11 @@
+
 'use client';
 
 import { UserDetails } from '@/types/user';
-
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+  
 interface Props {
   details: UserDetails;
   onClose: () => void;
@@ -131,3 +135,21 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
     </li>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

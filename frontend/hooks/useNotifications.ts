@@ -1,7 +1,15 @@
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 export type Notification = {
   id: string;
@@ -75,3 +83,21 @@ export function useNotifications(userId: number, role: string) {
 
   return { notifications, unreadCount, markAsRead };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

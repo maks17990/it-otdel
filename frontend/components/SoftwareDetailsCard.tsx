@@ -1,8 +1,16 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import { FaFilePdf, FaFileImage, FaFileAlt, FaTimes } from 'react-icons/fa';
 import { SoftwareDetails } from '@/types/software';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface Props {
   software: SoftwareDetails;
@@ -10,7 +18,7 @@ interface Props {
   onUserClick?: (userId: number) => void;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 
 export default function SoftwareDetailsCard({ software, onClose, onUserClick }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -94,7 +102,7 @@ export default function SoftwareDetailsCard({ software, onClose, onUserClick }: 
           <h4 className="text-base font-semibold mb-2 text-cyan-300">📎 Прикреплённые файлы:</h4>
           <div className="flex flex-wrap gap-4">
             {software.fileUrls.map((url, i) => {
-              const fullUrl = url.startsWith('http') ? url : `${baseUrl}/${url}`;
+              const fullUrl = url.startsWith('http') ? url : `${API_URL}/${url}`;
               const fileName = url.split('/').pop() || `Файл ${i + 1}`;
 
               return (
@@ -157,3 +165,21 @@ function InfoItem({ label, value, icon }: { label: string; value?: React.ReactNo
     </li>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

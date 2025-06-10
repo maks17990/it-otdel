@@ -18,6 +18,10 @@ import AdminNavbar from "@/components/AdminNavbar";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+
 const statusRu: Record<string, string> = {
   NEW: "Новая",
   IN_PROGRESS: "В работе",
@@ -74,7 +78,7 @@ interface RequestItem {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  
   const [token, setToken] = useState<string | null>(null);
 
   const [stats, setStats] = useState<Record<StatsKey, number>>({ users: 0, equipment: 0, requests: 0, telegram: 0 });

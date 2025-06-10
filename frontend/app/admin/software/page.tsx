@@ -11,12 +11,12 @@ import toast from 'react-hot-toast';
 import { SoftwareDetails, SoftwareFormData } from '@/types/software';
 import { UserDetails } from '@/types/user';
 import { Equipment, EquipmentDetails } from '@/types/equipment';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
 
 export default function AdminSoftwarePage() {
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
+  const [token, setToken] = useState<string | null>(null);
   const [softwareList, setSoftwareList] = useState<SoftwareDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +26,11 @@ export default function AdminSoftwarePage() {
   const [viewingEquipment, setViewingEquipment] = useState<EquipmentDetails | null>(null);
   const [users, setUsers] = useState<UserDetails[]>([]);
   const [equipment, setEquipment] = useState<EquipmentDetails[]>([]);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) setToken(storedToken);
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -43,12 +48,14 @@ export default function AdminSoftwarePage() {
       console.error('Ошибка токена:', err);
       router.push('/login');
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    fetchSoftware();
-    fetchUsersAndEquipment();
-  }, []);
+    if (token) {
+      fetchSoftware();
+      fetchUsersAndEquipment();
+    }
+  }, [token]);
 
   const fetchSoftware = async () => {
     setLoading(true);
@@ -321,3 +328,21 @@ export default function AdminSoftwarePage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

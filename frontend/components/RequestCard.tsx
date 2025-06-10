@@ -4,6 +4,11 @@ import React from 'react';
 import { Repeat2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 interface RequestCardProps {
   request: {
     id: number;
@@ -54,7 +59,6 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function RequestCard({ request, onRepeat }: RequestCardProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   const isClosed = request.status === 'COMPLETED' || request.status === 'DONE';
 
   return (
@@ -72,13 +76,13 @@ export default function RequestCard({ request, onRepeat }: RequestCardProps) {
           className="text-xs font-semibold rounded-full px-4 py-1 shadow border border-cyan-200/10"
           style={{
             background:
-              request.status === "NEW"
-                ? "rgba(34,211,238,0.13)"
-                : request.status === "IN_PROGRESS"
-                  ? "rgba(252,211,77,0.12)"
-                  : isClosed
-                    ? "rgba(74,222,128,0.13)"
-                    : "rgba(100,116,139,0.09)"
+              request.status === 'NEW'
+                ? 'rgba(34,211,238,0.13)'
+                : request.status === 'IN_PROGRESS'
+                ? 'rgba(252,211,77,0.12)'
+                : isClosed
+                ? 'rgba(74,222,128,0.13)'
+                : 'rgba(100,116,139,0.09)',
           }}
         >
           {STATUS_LABELS[request.status] || request.status}
@@ -95,8 +99,12 @@ export default function RequestCard({ request, onRepeat }: RequestCardProps) {
         {request.resolvedAt && (
           <span>✅ <span className="font-semibold">Завершено:</span> {new Date(request.resolvedAt).toLocaleString()}</span>
         )}
-        {request.priority && <span>⚡ <span className="font-semibold">Приоритет:</span> {PRIORITY_LABELS[request.priority]}</span>}
-        {request.category && <span>📁 <span className="font-semibold">Категория:</span> {request.category}</span>}
+        {request.priority && (
+          <span>⚡ <span className="font-semibold">Приоритет:</span> {PRIORITY_LABELS[request.priority]}</span>
+        )}
+        {request.category && (
+          <span>📁 <span className="font-semibold">Категория:</span> {request.category}</span>
+        )}
       </div>
 
       {isClosed && request.rating != null && (
@@ -129,9 +137,12 @@ export default function RequestCard({ request, onRepeat }: RequestCardProps) {
           <p className="text-sm font-semibold text-cyan-300 mb-2">📎 Вложения:</p>
           <div className="flex flex-wrap gap-3">
             {request.fileUrls.map((url, idx) => {
-              const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+              const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
               return (
-                <div key={idx} className="bg-cyan-400/10 border border-cyan-400/20 rounded-xl p-2 text-center text-xs shadow hover:shadow-lg transition max-w-[130px]">
+                <div
+                  key={idx}
+                  className="bg-cyan-400/10 border border-cyan-400/20 rounded-xl p-2 text-center text-xs shadow hover:shadow-lg transition max-w-[130px]"
+                >
                   {fullUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                     <img
                       src={fullUrl}
@@ -185,7 +196,7 @@ export default function RequestCard({ request, onRepeat }: RequestCardProps) {
 
       <div className="mt-5 flex gap-4">
         <button
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             onRepeat();
           }}

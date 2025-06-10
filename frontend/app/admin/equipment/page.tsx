@@ -9,6 +9,10 @@ import UserDetailsCard from "@/components/UserDetailsCard";
 import { EquipmentDetails } from "@/types/equipment";
 import { User, UserDetails } from "@/types/user";
 
+const API_URL = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+
 const initialForm = {
   inventoryNumber: "",
   name: "",
@@ -24,39 +28,33 @@ const initialForm = {
 };
 
 export default function AdminEquipmentPage() {
+  const [token, setToken] = useState<string | null>(null);
   const [equipmentList, setEquipmentList] = useState<EquipmentDetails[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [details, setDetails] = useState<EquipmentDetails | null>(null);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-
   const [form, setForm] = useState(initialForm);
 
-  // Получить токен (из localStorage, как на дашборде)
-  const getToken = () =>
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  // Заготовка для корректных headers
-  const getAuthHeaders = useCallback((): Record<string, string> => {
-    const token = getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
+  useEffect(() => {
+    const stored = localStorage.getItem("token");
+    if (stored) setToken(stored);
   }, []);
 
-  // Получить список оборудования
+  const getAuthHeaders = useCallback((): Record<string, string> => {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }, [token]);
+
   const fetchEquipment = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/equipment`,
-        {
-          credentials: "include",
-          headers: getAuthHeaders(),
-        }
-      );
+      const res = await fetch(`${API_URL}/equipment`, {
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
       const data = await res.json();
       setEquipmentList(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -67,16 +65,12 @@ export default function AdminEquipmentPage() {
     }
   }, [getAuthHeaders]);
 
-  // Получить пользователей
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users`,
-        {
-          credentials: "include",
-          headers: getAuthHeaders(),
-        }
-      );
+      const res = await fetch(`${API_URL}/users`, {
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -85,86 +79,63 @@ export default function AdminEquipmentPage() {
     }
   }, [getAuthHeaders]);
 
-  // Детальная информация об оборудовании
-  const viewDetails = useCallback(
-    async (id: number) => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/equipment/${id}`,
-          {
-            credentials: "include",
-            headers: getAuthHeaders(),
-          }
-        );
-        const data = await res.json();
-        setDetails(data);
-        setUserDetails(null);
-      } catch (err) {
-        console.error("Ошибка загрузки подробностей оборудования:", err);
-      }
-    },
-    [getAuthHeaders]
-  );
+  const viewDetails = useCallback(async (id: number) => {
+    try {
+      const res = await fetch(`${API_URL}/equipment/${id}`, {
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+      setDetails(data);
+      setUserDetails(null);
+    } catch (err) {
+      console.error("Ошибка загрузки подробностей оборудования:", err);
+    }
+  }, [getAuthHeaders]);
 
-  // Детальная информация о пользователе
-  const handleUserClick = useCallback(
-    async (userId: number) => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/details/${userId}`,
-          {
-            credentials: "include",
-            headers: getAuthHeaders(),
-          }
-        );
-        const data = await res.json();
-        setUserDetails(data);
-      } catch (err) {
-        console.error("Ошибка загрузки пользователя:", err);
-      }
-    },
-    [getAuthHeaders]
-  );
+  const handleUserClick = useCallback(async (userId: number) => {
+    try {
+      const res = await fetch(`${API_URL}/users/details/${userId}`, {
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+      setUserDetails(data);
+    } catch (err) {
+      console.error("Ошибка загрузки пользователя:", err);
+    }
+  }, [getAuthHeaders]);
 
-  // Удалить оборудование
-  const handleDelete = useCallback(
-    async (id: number) => {
-      if (!confirm("Удалить это оборудование?")) return;
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/equipment/${id}`,
-          {
-            method: "DELETE",
-            credentials: "include",
-            headers: getAuthHeaders(),
-          }
-        );
-        if (res.ok) {
-          await fetchEquipment();
-          setDetails(null);
-        } else {
-          alert("Ошибка при удалении");
-        }
-      } catch (err) {
-        alert("Ошибка сети при удалении");
+  const handleDelete = useCallback(async (id: number) => {
+    if (!confirm("Удалить это оборудование?")) return;
+    try {
+      const res = await fetch(`${API_URL}/equipment/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        await fetchEquipment();
+        setDetails(null);
+      } else {
+        alert("Ошибка при удалении");
       }
-    },
-    [fetchEquipment, getAuthHeaders]
-  );
+    } catch (err) {
+      alert("Ошибка сети при удалении");
+    }
+  }, [fetchEquipment, getAuthHeaders]);
 
   useEffect(() => {
     fetchEquipment();
     fetchUsers();
-    // eslint-disable-next-line
   }, [fetchEquipment, fetchUsers]);
 
-  // Сохранить оборудование (создать или отредактировать)
   const handleSubmit = async (e: React.FormEvent, file?: File | null) => {
     e.preventDefault();
     const method = isEdit ? "PUT" : "POST";
     const url = isEdit
-      ? `${process.env.NEXT_PUBLIC_API_URL}/equipment/${editId}`
-      : `${process.env.NEXT_PUBLIC_API_URL}/equipment`;
+      ? `${API_URL}/equipment/${editId}`
+      : `${API_URL}/equipment`;
 
     try {
       const res = await fetch(url, {
@@ -188,15 +159,12 @@ export default function AdminEquipmentPage() {
         if (eqId && file) {
           const formData = new FormData();
           formData.append("file", file);
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/equipment/${eqId}/upload`,
-            {
-              method: "POST",
-              body: formData,
-              credentials: "include",
-              headers: getAuthHeaders(),
-            }
-          );
+          await fetch(`${API_URL}/equipment/${eqId}/upload`, {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+            headers: getAuthHeaders(),
+          });
         }
 
         await fetchEquipment();
@@ -212,7 +180,6 @@ export default function AdminEquipmentPage() {
     }
   };
 
-  // Открыть модалку для редактирования
   const openEditModal = (item: EquipmentDetails) => {
     setForm({
       inventoryNumber: item.inventoryNumber,
@@ -364,3 +331,4 @@ export default function AdminEquipmentPage() {
     </div>
   );
 }
+

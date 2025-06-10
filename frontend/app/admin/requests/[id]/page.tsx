@@ -6,6 +6,11 @@ import AssignExecutorModal from '@/components/AssignExecutorModal';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useRouter, useParams } from 'next/navigation';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 const PRIORITY_LABELS: Record<string, string> = {
   LOW: 'Низкий',
   NORMAL: 'Обычный',
@@ -72,6 +77,7 @@ export default function AdminRequestPage() {
   const { isAdmin, role } = useUserRole?.() || { isAdmin: false, role: null };
   const canAssignExecutor = isAdmin || role === 'superuser';
 
+  const [token, setToken] = useState<string | null>(null);
   const [request, setRequest] = useState<RequestType | null>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
@@ -80,10 +86,6 @@ export default function AdminRequestPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [showAllComments, setShowAllComments] = useState(false);
-
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
   const [priority, setPriority] = useState<'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'>('NORMAL');
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState<Status>('NEW');
@@ -93,12 +95,17 @@ export default function AdminRequestPage() {
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const stored = localStorage.getItem('token');
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
     if (!token) {
       router.push('/login');
       return;
     }
     setLoading(true);
-    fetch(`${baseUrl}/requests/${id}`, {
+    fetch(`${API_URL}/requests/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {
@@ -108,7 +115,6 @@ export default function AdminRequestPage() {
         setComments(data.comments || []);
         setPriority((data.priority as any) || 'NORMAL');
         setCategory(data.category || '');
-        // Статус должен быть из enum, если нет — по умолчанию 'NEW'
         let nextStatus: Status = (data.status as Status);
         if (!(nextStatus in STATUS_LABELS)) nextStatus = 'NEW';
         setStatus(nextStatus);
@@ -119,7 +125,7 @@ export default function AdminRequestPage() {
         setErrorMessage('Не удалось загрузить заявку');
         setLoading(false);
       });
-  }, [id]);
+  }, [id, token]);
 
   useEffect(() => {
     if (commentsEndRef.current) {
@@ -154,7 +160,7 @@ export default function AdminRequestPage() {
     if (!comment.trim()) return;
     setErrorMessage('');
     const body = { text: comment, requestId: request.id };
-    const res = await fetch(`${baseUrl}/requests/${request.id}/comments`, {
+    const res = await fetch(`${API_URL}/requests/${request.id}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -175,7 +181,7 @@ export default function AdminRequestPage() {
     setErrorMessage('');
     let res;
     if (newFiles.length === 0) {
-      res = await fetch(`${baseUrl}/requests/${request.id}`, {
+      res = await fetch(`${API_URL}/requests/${request.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +201,7 @@ export default function AdminRequestPage() {
       formData.append('status', status || '');
       fileUrls.forEach((url) => formData.append('fileUrls[]', url));
       newFiles.forEach((file) => formData.append('files', file));
-      res = await fetch(`${baseUrl}/requests/${request.id}`, {
+      res = await fetch(`${API_URL}/requests/${request.id}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -306,7 +312,7 @@ export default function AdminRequestPage() {
               ) : (
                 <div className="flex flex-wrap gap-3 mt-2">
                   {fileUrls.map((url, idx) => {
-                    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+                    const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
                     return (
                       <a
                         key={idx}
@@ -444,7 +450,7 @@ export default function AdminRequestPage() {
         onClose={() => setExecutorModalOpen(false)}
         onAssign={async () => {
           setExecutorModalOpen(false);
-          const res = await fetch(`${baseUrl}/requests/${request.id}`, {
+          const res = await fetch(`${API_URL}/requests/${request.id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {

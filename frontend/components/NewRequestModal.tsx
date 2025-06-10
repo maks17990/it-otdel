@@ -7,6 +7,11 @@ import io from 'socket.io-client';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const apiBase = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.hostname}:3000`
+  : '';
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, 'ws') ?? '';
+
 interface NewRequestModalProps {
   onClose: () => void;
   onCreated?: () => void;
@@ -40,9 +45,6 @@ function decodeJwtPayload(token: string): DecodedTokenPayload {
   return JSON.parse(atob(base64));
 }
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, 'ws') ?? '';
-
 export default function NewRequestModal({ onClose, onCreated, initialState }: NewRequestModalProps) {
   const [form, setForm] = useState({
     title: initialState?.title || '',
@@ -58,23 +60,22 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<DecodedTokenPayload | null>(null);
-
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const socket = io(SOCKET_URL, { autoConnect: false });
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     if (!token) return;
     try {
       const payload = decodeJwtPayload(token);
       setCurrentUser(payload);
     } catch (err) {
-      console.error('❌ Ошибка при разборе токена:', err);
+      console.error('Ошибка при разборе токена:', err);
     }
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    if (form.userId !== undefined) {
+    const token = localStorage.getItem('token');
+    if (form.userId !== undefined && token) {
       fetch(`${apiBase}/users/details/${form.userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,7 +87,7 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
     } else {
       setSelectedUserInfo(null);
     }
-  }, [form.userId, token]);
+  }, [form.userId]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -95,10 +96,17 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
   };
 
   const handleSubmit = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Нет токена авторизации');
+      return;
+    }
+
     if (!form.title || !form.content) {
       setError('Заполните обязательные поля');
       return;
     }
+
     if (form.expectedResolutionDate && new Date(form.expectedResolutionDate) < new Date()) {
       setError('Дата выполнения не может быть в прошлом');
       return;
@@ -144,7 +152,6 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
         throw new Error(err.message || 'Ошибка при создании заявки');
       }
 
-      // Важно: коннект сокета только при отправке!
       socket.connect();
       socket.emit('new-request', {
         title: form.title,
@@ -178,10 +185,7 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center"
       >
-        <div
-          className="absolute inset-0 bg-black/80 backdrop-blur-[2px]"
-          onClick={onClose}
-        />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" onClick={onClose} />
         <motion.div
           initial={{ scale: 0.97, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -191,19 +195,7 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
           onClick={e => e.stopPropagation()}
           tabIndex={0}
         >
-          <h2 className="text-2xl font-bold text-center mb-2 text-cyan-200">
-            📝 Новая заявка
-          </h2>
-
-          {!currentUser && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm text-yellow-400 text-center"
-            >
-              ⚠️ Не удалось определить пользователя из токена
-            </motion.p>
-          )}
+          <h2 className="text-2xl font-bold text-center mb-2 text-cyan-200">📝 Новая заявка</h2>
 
           {currentUser && (
             <p className="text-xs text-cyan-300 text-center mb-2">
@@ -221,18 +213,17 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
               />
               {selectedUserInfo && (
                 <p className="text-sm text-cyan-200">
-                  🧾 <span className="font-semibold">Выбран:</span>{' '}
-                  {selectedUserInfo.lastName} {selectedUserInfo.firstName} {selectedUserInfo.middleName ?? ''}
+                  🧾 <span className="font-semibold">Выбран:</span> {selectedUserInfo.lastName} {selectedUserInfo.firstName} {selectedUserInfo.middleName ?? ''}
                 </p>
               )}
             </div>
           )}
 
-          <FormField label="Заголовок *" value={form.title} required onChange={(val) => setForm({ ...form, title: val })} />
-          <TextareaField label="Описание *" value={form.content} required onChange={(val) => setForm({ ...form, content: val })} />
-          <SelectField label="Приоритет" value={form.priority} options={PRIORITY_LABELS} onChange={(val) => setForm({ ...form, priority: val })} />
-          <FormField label="Категория" value={form.category} onChange={(val) => setForm({ ...form, category: val })} />
-          <FormField label="Ожидаемая дата выполнения" type="date" value={form.expectedResolutionDate} onChange={(val) => setForm({ ...form, expectedResolutionDate: val })} />
+          <FormField label="Заголовок *" value={form.title} required onChange={val => setForm({ ...form, title: val })} />
+          <TextareaField label="Описание *" value={form.content} required onChange={val => setForm({ ...form, content: val })} />
+          <SelectField label="Приоритет" value={form.priority} options={PRIORITY_LABELS} onChange={val => setForm({ ...form, priority: val })} />
+          <FormField label="Категория" value={form.category} onChange={val => setForm({ ...form, category: val })} />
+          <FormField label="Ожидаемая дата выполнения" type="date" value={form.expectedResolutionDate} onChange={val => setForm({ ...form, expectedResolutionDate: val })} />
 
           <div>
             <label className="text-sm font-medium text-cyan-200">📎 Прикрепить файлы</label>
@@ -245,18 +236,16 @@ export default function NewRequestModal({ onClose, onCreated, initialState }: Ne
             />
           </div>
 
-          <AnimatePresence>
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="bg-gradient-to-r from-pink-600/80 to-pink-400/90 px-4 py-2 rounded-xl text-white text-sm text-center shadow"
-              >
-                {error}
-              </motion.p>
-            )}
-          </AnimatePresence>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-gradient-to-r from-pink-600/80 to-pink-400/90 px-4 py-2 rounded-xl text-white text-sm text-center shadow"
+            >
+              {error}
+            </motion.p>
+          )}
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
@@ -286,12 +275,7 @@ function FormField({
   required?: boolean;
   type?: string;
 }) {
-  // Исправление: disabled теперь строго boolean!
-  const isDisabled =
-    type === 'date' &&
-    typeof value === 'string' &&
-    value !== '' &&
-    value < new Date().toISOString().slice(0, 10);
+  const isDisabled = type === 'date' && typeof value === 'string' && value !== '' && value < new Date().toISOString().slice(0, 10);
 
   return (
     <div>

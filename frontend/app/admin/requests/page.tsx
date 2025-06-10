@@ -8,6 +8,11 @@ import NewRequestModal from '@/components/NewRequestModal';
 import { Star, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 interface RequestItem {
   id: number;
   title: string;
@@ -72,6 +77,7 @@ const DEFAULT_STATUSES = ['NEW', 'IN_PROGRESS'];
 
 export default function AdminRequestsPage() {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -84,8 +90,10 @@ export default function AdminRequestsPage() {
   const [myAverageRating, setMyAverageRating] = useState<string>('—');
   const [myId, setMyId] = useState<number | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  useEffect(() => {
+    const stored = localStorage.getItem('token');
+    if (stored) setToken(stored);
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -104,7 +112,7 @@ export default function AdminRequestsPage() {
       console.error('Ошибка декодирования токена:', err);
       router.push('/login');
     }
-  }, []);
+  }, [token]);
 
   const loadRequests = () => {
     fetch(`${API_URL}/requests/assigned`, {
@@ -124,10 +132,8 @@ export default function AdminRequestsPage() {
 
   useEffect(() => {
     if (token) loadRequests();
-    // eslint-disable-next-line
-  }, []);
+  }, [token]);
 
-  // --- фильтрация ---
   const filteredRequests = requests.filter((req) => {
     const matchTitle = !filterTitle || req.title.toLowerCase().includes(filterTitle.toLowerCase());
     const matchPriority = !filterPriority || req.priority === filterPriority;
@@ -140,7 +146,6 @@ export default function AdminRequestsPage() {
         matchSource
       );
     }
-    // По умолчанию — только "Новые" и "В работе"
     return (
       DEFAULT_STATUSES.includes(req.status) &&
       matchTitle &&
@@ -149,7 +154,6 @@ export default function AdminRequestsPage() {
     );
   });
 
-  // Подсчёт персонального рейтинга (только для текущего исполнителя)
   useEffect(() => {
     if (!myId || requests.length === 0) {
       setMyAverageRating('—');
@@ -317,3 +321,21 @@ export default function AdminRequestsPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

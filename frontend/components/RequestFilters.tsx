@@ -1,6 +1,14 @@
+
 'use client';
 
 import React from 'react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface RequestFiltersProps {
   filterTitle: string;
@@ -105,3 +113,21 @@ export default function RequestFilters({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

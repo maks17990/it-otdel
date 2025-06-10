@@ -1,3 +1,4 @@
+
 export const PRIORITY_LABELS: Record<'LOW' | 'NORMAL' | 'HIGH' | 'URGENT', string> = {
     LOW: 'Низкий',
     NORMAL: 'Обычный',
@@ -17,3 +18,15 @@ export const PRIORITY_LABELS: Record<'LOW' | 'NORMAL' | 'HIGH' | 'URGENT', strin
     PHONE: 'По телефону',
   };
   
+
+
+
+
+
+
+
+
+
+
+
+

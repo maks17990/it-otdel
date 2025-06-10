@@ -1,15 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import AdminNavbar from '@/components/AdminNavbar';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 export default function AdminNewsPage() {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const stored = localStorage.getItem('token');
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
     if (!token) {
       router.push('/login');
       return;
@@ -25,14 +35,16 @@ export default function AdminNewsPage() {
       console.error('Ошибка декодирования токена:', err);
       router.push('/login');
     }
-  }, []);
+  }, [token, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#13151e] via-[#182232] to-[#212e43] text-white pt-20 px-3 md:px-10 py-10">
       <AdminNavbar />
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-cyan-200 mb-4 mt-10">📰 Новости и рассылки</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-cyan-200 mb-4 mt-10">
+          📰 Новости и рассылки
+        </h1>
         <p className="text-cyan-100/70 mb-8 text-lg">
           Публикация новостей в Telegram-канал, управление лентой и архивами.<br />
           Возможна интеграция с ботом.

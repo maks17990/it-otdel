@@ -8,14 +8,17 @@ import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { jwtDecode } from 'jwt-decode';
 
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
 export default function Home() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const router = useRouter();
 
   useEffect(() => {
     const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
-    if (cookie) {
-      const token = cookie.split('=')[1];
+    const token = cookie?.split('=')[1];
+
+    if (token) {
       try {
         const payload = jwtDecode(token);
         // @ts-ignore
@@ -35,7 +38,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-3 md:px-8 bg-gradient-to-br from-[#13151e] via-[#182232] to-[#212e43] text-white">
-      {/* Лого/иконка и название */}
       <motion.div
         initial={{ opacity: 0, y: -32 }}
         animate={{ opacity: 1, y: 0 }}
@@ -53,7 +55,6 @@ export default function Home() {
         </div>
       </motion.div>
 
-      {/* Табы */}
       <motion.div
         className="flex gap-3 mb-8 rounded-full bg-white/10 border border-cyan-200/20 backdrop-blur-xl p-2 shadow-inner"
         initial={{ scale: 0.97, opacity: 0 }}
@@ -80,7 +81,6 @@ export default function Home() {
         </button>
       </motion.div>
 
-      {/* Форма */}
       <motion.div
         className={`bg-white/10 border border-cyan-200/10 backdrop-blur-2xl p-9 rounded-2xl shadow-2xl w-full transition-all duration-300
           ${tab === 'register' ? 'max-w-3xl' : 'max-w-md'}`}
@@ -91,7 +91,6 @@ export default function Home() {
         {tab === 'login' ? <LoginForm /> : <RegisterForm />}
       </motion.div>
 
-      {/* Нижняя микро-подсказка */}
       <div className="text-[11px] text-cyan-100/40 mt-8 font-light text-center select-none">
         <span className="opacity-70">© 2025 IT-отдел. Всё анонимно. Все права защищены.</span>
       </div>

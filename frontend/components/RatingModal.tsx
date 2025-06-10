@@ -1,9 +1,17 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface RatingModalProps {
   open: boolean;
@@ -106,3 +114,21 @@ export default function RatingModal({
     </AnimatePresence>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

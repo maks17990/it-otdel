@@ -6,17 +6,23 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import NewRequestModal from '@/components/NewRequestModal';
 import {
+  Star,
+  PlusCircle,
+  BookOpen,
+  MessageSquare,
   Clock,
   Bell,
   FolderKanban,
   User,
   FileWarning,
   Newspaper,
-  HelpCircle,
-  PlusCircle,
-  BookOpen,
-  MessageSquare
+  HelpCircle
 } from 'lucide-react';
+
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
 
 const STATUS_LABELS: Record<string, string> = {
   'NEW': 'Новая',
@@ -39,9 +45,12 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [requestsCount, setRequestsCount] = useState<number | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  useEffect(() => {
+    const stored = localStorage.getItem("token");
+    if (stored) setToken(stored);
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -57,7 +66,7 @@ export default function Dashboard() {
     } catch {
       router.push('/login');
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -84,7 +93,6 @@ export default function Dashboard() {
     if (token) fetchProfile();
   }, [token]);
 
-  // Получение количества заявок в работе
   useEffect(() => {
     if (user?.id) {
       fetch(`${API_URL}/requests/user/${user.id}`, {
@@ -266,3 +274,21 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

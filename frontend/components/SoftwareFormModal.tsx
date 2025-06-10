@@ -1,9 +1,17 @@
+
 'use client';
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { SoftwareFormData } from '@/types/software';
 import { User } from '@/types/user';
 import { Equipment } from '@/types/equipment';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface Props {
   isOpen: boolean;
@@ -265,3 +273,21 @@ export default function SoftwareFormModal({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

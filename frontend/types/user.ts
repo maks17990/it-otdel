@@ -1,3 +1,4 @@
+
 export type UserRole = 'USER' | 'ADMIN' | 'SUPERADMIN';
 
 export interface User {
@@ -34,3 +35,15 @@ export interface UserDetails extends User {
   assignedEquipment?: AssignedEquipment[];
   assignedSoftware?: AssignedSoftware[];
 }
+
+
+
+
+
+
+
+
+
+
+
+

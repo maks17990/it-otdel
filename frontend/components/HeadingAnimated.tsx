@@ -1,7 +1,15 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
 import { Fragment } from 'react';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 interface Props {
   text: string;
@@ -55,3 +63,21 @@ export default function HeadingAnimated({ text }: Props) {
     </motion.h1>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

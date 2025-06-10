@@ -1,27 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import LogoutButton from '@/components/LogoutButton';
 import { ShieldCheck } from 'lucide-react';
 
+const API_URL =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : '';
+
 export default function SuperAdminPanel() {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('token='))
-      ?.split('=')[1];
+    // Получаем токен из cookies
+    const rawToken =
+      typeof document !== 'undefined'
+        ? document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('token='))
+            ?.split('=')[1]
+        : null;
 
-    if (!token) {
+    if (!rawToken) {
       router.push('/login');
       return;
     }
 
+    setToken(rawToken);
+
     try {
-      const decoded: any = jwtDecode(token);
+      const decoded: any = jwtDecode(rawToken);
       if (decoded.role !== 'superuser') {
         const roleRedirect: Record<string, string> = {
           admin: '/admin',
@@ -47,11 +59,12 @@ export default function SuperAdminPanel() {
         <div className="text-base text-cyan-100/80 mb-2 text-center">
           Вы вошли как <span className="text-cyan-400 font-bold">супер-админ</span>
         </div>
-        {/* Здесь можно добавить ссылки или карточки управления */}
         <div className="w-full flex flex-col items-center mt-4 mb-6">
           <div className="bg-white/10 border border-cyan-400/10 rounded-2xl shadow p-6 w-full text-center text-cyan-100/90">
             Добро пожаловать в корпоративную панель управления.<br />
-            <span className="text-cyan-200/90">Здесь появятся возможности управления пользователями, правами и настройками организации.</span>
+            <span className="text-cyan-200/90">
+              Здесь появятся возможности управления пользователями, правами и настройками организации.
+            </span>
           </div>
         </div>
         <LogoutButton />

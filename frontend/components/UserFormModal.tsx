@@ -1,7 +1,15 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { AsYouType, isValidPhoneNumber } from 'libphonenumber-js';
+const API_URL = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:3000` : '';
+
+
+
+
+
+
 
 const departmentLabels: Record<string, string> = {
   AHO: 'Административно-хозяйственная часть',
@@ -457,3 +465,21 @@ function Input({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
