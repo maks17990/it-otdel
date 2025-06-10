@@ -8,6 +8,10 @@ import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import { jwtDecode } from 'jwt-decode';
 
+interface JwtPayload {
+  role?: string;
+}
+
 export default function Home() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const router = useRouter();
@@ -17,8 +21,7 @@ export default function Home() {
     if (cookie) {
       const token = cookie.split('=')[1];
       try {
-        const payload = jwtDecode(token);
-        // @ts-ignore
+        const payload = jwtDecode<JwtPayload>(token);
         const role = payload.role;
         if (role === 'superuser') {
           router.push('/superadmin');
