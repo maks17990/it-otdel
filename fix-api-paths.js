@@ -4,8 +4,7 @@ const path = require('path');
 const baseDirs = [
   './frontend/app',
   './frontend/pages',
-  './frontend/components',
-  './frontend/services'
+  './frontend/components'
 ];
 
 const apiRegex = /fetch\(\s*['"`]\/([^'"`]+)['"`]\s*\)/g;
