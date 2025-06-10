@@ -8,12 +8,14 @@ import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 import { PrismaService } from './prisma/prisma.service';
 import { AdminLogsGateway } from './admin/admin-logs.gateway';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   // Загружаем .env вручную, чтобы быть уверенным
   dotenv.config();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useWebSocketAdapter(new WsAdapter(app));
 
   // 👇 Подключаем Live-лог gateway
   const adminLogsGateway = app.get(AdminLogsGateway);
