@@ -24,8 +24,8 @@ export default function AdminNotificationsPage() {
     const fetchData = async () => {
       try {
         const [notifRes, countRes] = await Promise.all([
-          axios.get('/notifications', { withCredentials: true }),
-          axios.get('/notifications/unread-count', { withCredentials: true }),
+          axios.get('/api/notifications', { withCredentials: true }),
+          axios.get('/api/notifications/unread-count', { withCredentials: true }),
         ]);
 
         setNotifications(notifRes.data);
@@ -42,7 +42,7 @@ export default function AdminNotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      await axios.patch(`/notifications/${id}/read`, {}, { withCredentials: true });
+      await axios.patch(`/api/notifications/${id}/read`, {}, { withCredentials: true });
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
