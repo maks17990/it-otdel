@@ -18,6 +18,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Environment variables
+
+Copy `.env.example` to `.env.local` and set values for the following variables:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3000   # адрес backend API
+NEXT_PUBLIC_SITE_URL=http://localhost:3001  # публичный адрес фронтенда
+```
+
+These variables are also defined in `frontend.env.dev` and `frontend.env.prod`
+for Docker-based development and production setups.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
