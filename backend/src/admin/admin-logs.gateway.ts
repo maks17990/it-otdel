@@ -16,7 +16,7 @@ import { Server, WebSocket } from 'ws'; // Используем ws, не socket.
 })
 export class AdminLogsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server?: Server;
 
   afterInit(server: Server) {
     console.log('[WS] /admin/logs initialized');
@@ -38,6 +38,7 @@ export class AdminLogsGateway implements OnGatewayInit, OnGatewayConnection, OnG
 
   // Вызывай этот метод из сервисов для рассылки сообщений по логам
   sendLog(message: string) {
+    if (!this.server) return;
     for (const client of this.server.clients) {
       // У ws есть readyState константы (0=CONNECTING, 1=OPEN, 2=CLOSING, 3=CLOSED)
       if (client.readyState === client.OPEN) {
