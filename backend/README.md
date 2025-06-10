@@ -68,7 +68,21 @@ $ npm install -g @nestjs/mau
 $ mau deploy
 ```
 
+
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Managing Uploads
+
+Uploaded files are stored in `backend/uploads` during development. This folder is excluded from version control. Use a persistent volume or external storage to keep uploads outside the repository. When running with Docker compose, mount a host path into the container:
+
+```yaml
+services:
+  backend:
+    volumes:
+      - ./uploads:/app/backend/uploads
+```
+
+Alternatively, configure an object storage service such as S3 and update the application to store files there.
+
 
 ## Resources
 
