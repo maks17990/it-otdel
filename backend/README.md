@@ -96,3 +96,21 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## Monitoring endpoint
+
+The `/admin/monitoring` route provides basic equipment health information.
+It pings each device's `ipAddress` and returns an array of objects:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Server 1",
+    "ipAddress": "192.168.0.10",
+    "status": "online"
+  }
+]
+```
+
+Use this endpoint from the admin panel to display current status and receive live log updates via the `/admin/logs` WebSocket namespace.

@@ -75,4 +75,10 @@ export class AdminController {
   async getHourlyActivity() {
     return this.adminService.getHourlyActivity();
   }
+
+  @Get('monitoring')
+  @Roles('admin', 'superuser')
+  async getMonitoring() {
+    return this.adminService.getMonitoring();
+  }
 }
