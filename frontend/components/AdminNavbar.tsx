@@ -23,6 +23,7 @@ const navItems = [
   { label: 'Уведомления', href: '/admin/notifications' },
   { label: 'Новости', href: '/admin/news' },
   { label: 'Мониторинг', href: '/admin/monitoring' },
+  { label: 'Отчёты', href: '/admin/reports' },
 ];
 
 export default function AdminNavbar() {
