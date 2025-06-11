@@ -1,12 +1,12 @@
 # ========================
 # СТАДИЯ 1: Сборка проекта
 # ========================
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 WORKDIR /app
 
 # Установка необходимых утилит
-RUN apk add --no-cache tini git
+RUN apt-get update && apt-get install -y tini git
 
 # ✅ Корректное копирование package.json и package-lock.json
 COPY package.json package-lock.json* ./
@@ -14,7 +14,7 @@ COPY package.json package-lock.json* ./
 # Копирование схемы Prisma
 COPY prisma ./prisma
 
-# Установка прод-зависимостей
+# Установка прод-зависимостей (и dev-зависимостей тоже, чтобы собрать проект и prisma client)
 RUN npm install --legacy-peer-deps
 
 # Копирование исходников проекта
@@ -27,15 +27,15 @@ RUN npm run build
 # ========================
 # СТАДИЯ 2: Финальный образ
 # ========================
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 
 # Создание непривилегированного пользователя
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Установка tini
-RUN apk add --no-cache tini
+RUN apt-get update && apt-get install -y tini
 
 # Копирование собранного приложения
 COPY --from=builder /app /app
@@ -47,7 +47,7 @@ ENV NODE_ENV=production
 USER appuser
 
 # Инициализация через tini
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # Команда по умолчанию
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
