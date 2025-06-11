@@ -297,4 +297,81 @@ export class AdminService {
       throw new InternalServerErrorException('Не удалось получить данные мониторинга');
     }
   }
+
+  /**
+   * Заявки по администраторам (executorId)
+   * Возвращает количество всех, открытых и закрытых заявок по каждому администратору
+   */
+  async getRequestsByAdmin(dateFrom?: Date, dateTo?: Date) {
+    try {
+      const where: any = { executorId: { not: null } };
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) where.createdAt.gte = dateFrom;
+        if (dateTo) where.createdAt.lte = dateTo;
+      }
+
+      const grouped = await this.prisma.request.groupBy({
+        by: ['executorId', 'status'],
+        where,
+        _count: true,
+      });
+
+      const statsMap: Record<
+        number,
+        { total: number; closed: number; open: number }
+      > = {};
+
+      for (const row of grouped) {
+        if (row.executorId === null) continue;
+        if (!statsMap[row.executorId]) {
+          statsMap[row.executorId] = { total: 0, closed: 0, open: 0 };
+        }
+        const entry = statsMap[row.executorId];
+        entry.total += row._count;
+        if (['DONE', 'COMPLETED', 'REJECTED'].includes(row.status)) {
+          entry.closed += row._count;
+        } else {
+          entry.open += row._count;
+        }
+      }
+
+      const ids = Object.keys(statsMap).map((i) => parseInt(i, 10));
+      const users = await this.prisma.user.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, firstName: true, lastName: true, middleName: true },
+      });
+
+      return users.map((u) => ({
+        executorId: u.id,
+        name: `${u.lastName} ${u.firstName}`.trim(),
+        ...statsMap[u.id],
+      }));
+    } catch (error) {
+      this.logger.error(
+        '❌ Ошибка отчёта по администраторам',
+        error instanceof Error ? error.stack : '',
+      );
+      throw new InternalServerErrorException('Не удалось сформировать отчёт');
+    }
+  }
+
+  /** CSV экспорт отчёта по администраторам */
+  async getRequestsByAdminCsv(dateFrom?: Date, dateTo?: Date) {
+    const data = await this.getRequestsByAdmin(dateFrom, dateTo);
+    const header = 'executorId,name,total,closed,open';
+    const rows = data.map(
+      (r) => `${r.executorId},"${r.name}",${r.total},${r.closed},${r.open}`,
+    );
+    return [header, ...rows].join('\n');
+  }
+
+  /** Заглушка для отчёта по оборудованию */
+  async getRequestsByEquipment() {
+    return [];
+  }
+
+  async getRequestsByEquipmentCsv() {
+    return 'equipmentId,name,total,closed,open\n';
+  }
 }

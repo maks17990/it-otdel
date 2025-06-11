@@ -1,7 +1,8 @@
-import { Controller, Get, Req, UseGuards, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, ForbiddenException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { TelegramService } from '../telegram/telegram.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Response } from 'express';
 
 // --- Пример простого кастомного декоратора для ролей ---
 function Roles(...roles: string[]) {
@@ -114,5 +115,43 @@ export class AdminController {
   @Roles('admin', 'superuser')
   async getMonitoring() {
     return this.adminService.getMonitoring();
+  }
+
+  @Get('reports/requests-by-admin')
+  @Roles('admin', 'superuser')
+  async getRequestsByAdmin(@Req() req) {
+    const { dateFrom, dateTo } = req.query;
+    return this.adminService.getRequestsByAdmin(
+      dateFrom ? new Date(dateFrom) : undefined,
+      dateTo ? new Date(dateTo) : undefined,
+    );
+  }
+
+  @Get('reports/requests-by-admin/csv')
+  @Roles('admin', 'superuser')
+  async getRequestsByAdminCsv(@Req() req, @Res() res: Response) {
+    const { dateFrom, dateTo } = req.query;
+    const csv = await this.adminService.getRequestsByAdminCsv(
+      dateFrom ? new Date(dateFrom) : undefined,
+      dateTo ? new Date(dateTo) : undefined,
+    );
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="requests_by_admin.csv"');
+    res.send(csv);
+  }
+
+  @Get('reports/requests-by-equipment')
+  @Roles('admin', 'superuser')
+  async getRequestsByEquipment() {
+    return this.adminService.getRequestsByEquipment();
+  }
+
+  @Get('reports/requests-by-equipment/csv')
+  @Roles('admin', 'superuser')
+  async getRequestsByEquipmentCsv(@Res() res: Response) {
+    const csv = await this.adminService.getRequestsByEquipmentCsv();
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="requests_by_equipment.csv"');
+    res.send(csv);
   }
 }
