@@ -142,14 +142,26 @@ export class AdminController {
 
   @Get('reports/requests-by-equipment')
   @Roles('admin', 'superuser')
-  async getRequestsByEquipment() {
-    return this.adminService.getRequestsByEquipment();
+  async getRequestsByEquipment(@Req() req) {
+    const { dateFrom, dateTo, type, location } = req.query;
+    return this.adminService.getRequestsByEquipment(
+      dateFrom ? new Date(dateFrom) : undefined,
+      dateTo ? new Date(dateTo) : undefined,
+      type as string | undefined,
+      location as string | undefined,
+    );
   }
 
   @Get('reports/requests-by-equipment/csv')
   @Roles('admin', 'superuser')
-  async getRequestsByEquipmentCsv(@Res() res: Response) {
-    const csv = await this.adminService.getRequestsByEquipmentCsv();
+  async getRequestsByEquipmentCsv(@Req() req, @Res() res: Response) {
+    const { dateFrom, dateTo, type, location } = req.query;
+    const csv = await this.adminService.getRequestsByEquipmentCsv(
+      dateFrom ? new Date(dateFrom) : undefined,
+      dateTo ? new Date(dateTo) : undefined,
+      type as string | undefined,
+      location as string | undefined,
+    );
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename="requests_by_equipment.csv"');
     res.send(csv);

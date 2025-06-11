@@ -120,6 +120,7 @@ export class RequestsService {
         fileUrls,
         userId: effectiveUserId,
         executorId,
+        equipmentId: dto.equipmentId ?? null,
         assignedAt: executorId ? new Date() : null,
         source: (dto.source as RequestSource) ?? RequestSource.WEB,
       };
@@ -386,6 +387,10 @@ export class RequestsService {
         if (!oldRequest.assignedAt) {
           updateData.assignedAt = new Date();
         }
+      }
+
+      if (dto.equipmentId !== undefined) {
+        updateData.equipmentId = dto.equipmentId;
       }
 
       if (dto.expectedResolutionDate !== undefined) {

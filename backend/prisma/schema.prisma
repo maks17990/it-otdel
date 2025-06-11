@@ -119,6 +119,7 @@ model Equipment {
   assignedToUserId Int?
   assignedTo       User?      @relation("AssignedEquipment", fields: [assignedToUserId], references: [id])
   software         Software[] @relation("EquipmentToSoftware")
+  requests         Request[]
 }
 
 model Software {
@@ -164,6 +165,9 @@ model Request {
 
   executorId               Int?
   executor                 User?          @relation("ExecutorRelation", fields: [executorId], references: [id])
+
+  equipmentId              Int?
+  equipment                Equipment?     @relation(fields: [equipmentId], references: [id])
 
   rating                   Int?
   feedback                 String?

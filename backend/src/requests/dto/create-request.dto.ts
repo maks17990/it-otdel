@@ -64,6 +64,13 @@ export class CreateRequestDto {
   executorId?: number;
 
   @IsOptional()
+  @Transform(({ value }) =>
+    value === undefined || value === null || value === '' ? undefined : Number(value)
+  )
+  @IsInt({ message: 'ID оборудования должен быть числом' })
+  equipmentId?: number;
+
+  @IsOptional()
   @Transform(({ value }) => Array.isArray(value) ? value : value ? [value] : [])
   @IsArray({ message: 'fileUrls должен быть массивом строк (URL)' })
   @IsString({ each: true, message: 'Каждая ссылка должна быть строкой (URL)' })

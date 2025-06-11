@@ -69,6 +69,13 @@ export class UpdateRequestDto {
   executorId?: number;
 
   @IsOptional()
+  @Transform(({ value }) =>
+    value === undefined || value === null || value === '' ? undefined : Number(value)
+  )
+  @IsInt({ message: 'ID оборудования должен быть числом' })
+  equipmentId?: number;
+
+  @IsOptional()
   @IsDateString({}, { message: 'Ожидаемая дата должна быть в формате ISO' })
   expectedResolutionDate?: string;
 

@@ -121,3 +121,10 @@ Use this endpoint from the admin panel to display current status and receive liv
 * `GET /admin/stats/equipment-faults?days=N` – top equipment by number of faults. Currently returns an empty list as requests are not linked with equipment.
 * `GET /admin/stats/users-activity?days=N` – number of active users per day.
 * `GET /admin/audit-log` – query audit log. Supports parameters: `userId`, `type`, `dateFrom`, `dateTo`, `entityType`.
+
+## Reporting endpoints
+
+* `GET /admin/reports/requests-by-admin` – requests grouped by executor. Supports `dateFrom` and `dateTo` query params.
+* `GET /admin/reports/requests-by-admin/csv` – same data in CSV.
+* `GET /admin/reports/requests-by-equipment` – requests statistics by equipment. Supports `dateFrom`, `dateTo`, `type`, `location`.
+* `GET /admin/reports/requests-by-equipment/csv` – CSV export of equipment report. Result encoded in UTF‑8 with BOM for Excel compatibility.

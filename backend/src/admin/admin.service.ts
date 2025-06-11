@@ -366,12 +366,132 @@ export class AdminService {
     return [header, ...rows].join('\n');
   }
 
-  /** Заглушка для отчёта по оборудованию */
-  async getRequestsByEquipment() {
-    return [];
+  /** Отчёт по оборудованию */
+  async getRequestsByEquipment(
+    dateFrom?: Date,
+    dateTo?: Date,
+    type?: string,
+    location?: string,
+  ) {
+    try {
+      const where: any = { equipmentId: { not: null } };
+      if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) where.createdAt.gte = dateFrom;
+        if (dateTo) where.createdAt.lte = dateTo;
+      }
+      if (type || location) {
+        where.equipment = {};
+        if (type) where.equipment.type = type;
+        if (location) where.equipment.location = location;
+      }
+
+      const requests = await this.prisma.request.findMany({
+        where,
+        select: {
+          equipmentId: true,
+          status: true,
+          createdAt: true,
+          resolvedAt: true,
+          expectedResolutionDate: true,
+        },
+      });
+
+      if (!requests.length) return [];
+
+      const now = new Date();
+      const statsMap: Record<
+        number,
+        {
+          total: number;
+          closed: number;
+          open: number;
+          overdue: number;
+          resolutionSum: number;
+          resolutionCount: number;
+        }
+      > = {};
+
+      for (const r of requests) {
+        if (r.equipmentId === null) continue;
+        if (!statsMap[r.equipmentId]) {
+          statsMap[r.equipmentId] = {
+            total: 0,
+            closed: 0,
+            open: 0,
+            overdue: 0,
+            resolutionSum: 0,
+            resolutionCount: 0,
+          };
+        }
+
+        const entry = statsMap[r.equipmentId];
+        entry.total++;
+
+        const isClosed = ['DONE', 'COMPLETED', 'REJECTED'].includes(r.status);
+        if (isClosed) {
+          entry.closed++;
+          if (r.resolvedAt) {
+            entry.resolutionSum +=
+              r.resolvedAt.getTime() - r.createdAt.getTime();
+            entry.resolutionCount++;
+          }
+        } else {
+          entry.open++;
+          if (
+            r.expectedResolutionDate &&
+            r.expectedResolutionDate.getTime() < now.getTime()
+          ) {
+            entry.overdue++;
+          }
+        }
+      }
+
+      const ids = Object.keys(statsMap).map((i) => parseInt(i, 10));
+      const equipment = await this.prisma.equipment.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, name: true, type: true, location: true },
+      });
+
+      return equipment.map((eq) => {
+        const data = statsMap[eq.id];
+        const avgResMs =
+          data.resolutionCount > 0 ? data.resolutionSum / data.resolutionCount : 0;
+        return {
+          equipmentId: eq.id,
+          name: eq.name,
+          type: eq.type,
+          location: eq.location,
+          total: data.total,
+          open: data.open,
+          closed: data.closed,
+          overdue: data.overdue,
+          avgResolutionHours: avgResMs ? +(avgResMs / 3600000).toFixed(2) : null,
+          repeat: data.total > 1 ? data.total - 1 : 0,
+        };
+      });
+    } catch (error) {
+      this.logger.error(
+        '❌ Ошибка отчёта по оборудованию',
+        error instanceof Error ? error.stack : '',
+      );
+      throw new InternalServerErrorException('Не удалось сформировать отчёт');
+    }
   }
 
-  async getRequestsByEquipmentCsv() {
-    return 'equipmentId,name,total,closed,open\n';
+  async getRequestsByEquipmentCsv(
+    dateFrom?: Date,
+    dateTo?: Date,
+    type?: string,
+    location?: string,
+  ) {
+    const data = await this.getRequestsByEquipment(dateFrom, dateTo, type, location);
+    const header =
+      '\uFEFFequipmentId,name,type,location,total,open,closed,overdue,avgResolutionHours,repeat';
+    const rows = data.map(
+      (r) =>
+        `${r.equipmentId},"${r.name}",${r.type},${r.location},${r.total},${r.open},${r.closed},${r.overdue},${r.avgResolutionHours ?? ''},${r.repeat}`,
+    );
+    return [header, ...rows].join('\n');
   }
 }
