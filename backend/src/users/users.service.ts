@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { NotificationService } from '../notifications/notification.service';
 import { NotificationType } from '../notifications/dto/create-notification.dto';
 import axios from 'axios';
-import { AuditLogService } from '../admin/audit-log.service';
 
 // ======= Telegram Group Notify ==========
 async function notifyTelegramGroup(message: string) {
@@ -41,7 +40,6 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationService,
-    private readonly auditLog: AuditLogService,
   ) {}
 
   async getAllUsers() {
@@ -127,13 +125,6 @@ export class UsersService {
     await notifyTelegramGroup(
       `👤 *Новый пользователь зарегистрирован!*\n${newUser.lastName} ${newUser.firstName} (${newUser.department})`
     );
-
-    await this.auditLog.create({
-      userId: newUser.id,
-      actionType: 'user_created',
-      entityType: 'user',
-      entityId: newUser.id,
-    });
 
     return newUser;
   }

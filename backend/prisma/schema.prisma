@@ -97,7 +97,6 @@ model User {
   software          Software[]  @relation("UserToSoftware")
   comments          Comment[]
   notifications     Notification[]
-  auditLogs        AuditLog[]
 }
 
 model Equipment {
@@ -119,7 +118,6 @@ model Equipment {
   assignedToUserId Int?
   assignedTo       User?      @relation("AssignedEquipment", fields: [assignedToUserId], references: [id])
   software         Software[] @relation("EquipmentToSoftware")
-  requests         Request[]
 }
 
 model Software {
@@ -166,9 +164,6 @@ model Request {
   executorId               Int?
   executor                 User?          @relation("ExecutorRelation", fields: [executorId], references: [id])
 
-  equipmentId              Int?
-  equipment                Equipment?     @relation(fields: [equipmentId], references: [id])
-
   rating                   Int?
   feedback                 String?
   fileUrls                 String[]       @default([])
@@ -210,17 +205,4 @@ model News {
   title     String   @db.VarChar(200)
   content   String
   createdAt DateTime @default(now())
-}
-
-model AuditLog {
-  id         Int      @id @default(autoincrement())
-  userId     Int?
-  user       User?    @relation(fields: [userId], references: [id])
-  actionType String
-  entityType String
-  entityId   Int?
-  params     Json?
-  createdAt  DateTime @default(now())
-
-  @@index([createdAt])
 }
