@@ -13,7 +13,10 @@ import {
 import { CommentsService } from './comments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Request } from 'express';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('requests')
+@ApiBearerAuth()
 @Controller('requests/:requestId/comments')
 @UseGuards(JwtAuthGuard)
 export class CommentsController {

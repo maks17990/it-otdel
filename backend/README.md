@@ -56,6 +56,10 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+## API Documentation
+
+Swagger UI is available at `/api/docs` when the application is running.
+
 
 ## Deployment
 

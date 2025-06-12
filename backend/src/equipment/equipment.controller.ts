@@ -22,7 +22,10 @@ import { Express } from 'express';
 import { Roles } from '../auth/roles.decorator';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('equipment')
+@ApiBearerAuth()
 @Controller('equipment')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class EquipmentController {

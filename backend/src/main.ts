@@ -8,6 +8,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 import { PrismaService } from './prisma/prisma.service';
 import { AdminLogsGateway } from './admin/admin-logs.gateway';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   // Загружаем .env вручную, чтобы быть уверенным
@@ -87,6 +88,15 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: 'Content-Type, Authorization, Cookie',
   });
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('IT Otdel API')
+    .setDescription('API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDocument);
 
   const port = process.env.PORT || 3000;
 
