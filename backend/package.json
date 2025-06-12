@@ -33,7 +33,7 @@
     "@nestjs/platform-socket.io": "^11.0.1",
     "@nestjs/websockets": "^11.0.1",
     "@nestjs/swagger": "^7.2.7",
-    "swagger-ui-express": "^4.7.2",
+    "swagger-ui-express": "^5.0.1",
     "@prisma/client": "^6.7.0",
     "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
