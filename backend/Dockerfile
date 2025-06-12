@@ -14,11 +14,8 @@ COPY package.json package-lock.json* ./
 # Копирование схемы Prisma
 COPY prisma ./prisma
 
-# Установка прод-зависимостей c увеличенными таймаутами скачивания
-RUN npm config set fetch-retry-maxtimeout 600000 \
-    && npm config set fetch-retry-mintimeout 20000 \
-    && npm config set fetch-retries 5 \
-    && npm install --legacy-peer-deps
+# Установка прод-зависимостей
+RUN npm install --legacy-peer-deps
 
 # Копирование исходников проекта
 COPY . .
