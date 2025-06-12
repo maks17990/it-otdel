@@ -27,6 +27,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 const uploadPath = resolve('./uploads');
 
@@ -38,6 +39,8 @@ function fileFilter(req, file, cb) {
   cb(null, true);
 }
 
+@ApiTags('requests')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('requests')
 export class RequestsController {

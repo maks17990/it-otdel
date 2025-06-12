@@ -2,6 +2,7 @@ import { Controller, Get, Req, UseGuards, ForbiddenException } from '@nestjs/com
 import { AdminService } from './admin.service';
 import { TelegramService } from '../telegram/telegram.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 // --- Пример простого кастомного декоратора для ролей ---
 function Roles(...roles: string[]) {
@@ -23,6 +24,8 @@ class RolesGuard implements CanActivate {
   }
 }
 
+@ApiTags('admin')
+@ApiBearerAuth()
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard) // <--- Добавил универсальный guard!
 export class AdminController {
