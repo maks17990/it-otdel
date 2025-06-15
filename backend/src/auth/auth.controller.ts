@@ -12,6 +12,7 @@ import { Response } from 'express';
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +22,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60 } })
   @HttpCode(201)
   async register(@Body() body: RegisterDto) {
     const birthDate = new Date(body.birthDate);
@@ -38,6 +40,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60 } })
   @HttpCode(200)
   async login(
     @Body() body: LoginDto,

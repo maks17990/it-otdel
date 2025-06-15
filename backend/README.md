@@ -31,6 +31,11 @@
 $ npm install
 ```
 
+## Environment variables
+
+Set `JWT_SECRET` in your environment or `.env` file before starting the server.
+The application will refuse to run without it.
+
 ## Compile and run the project
 
 ```bash

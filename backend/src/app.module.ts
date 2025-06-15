@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
@@ -22,6 +24,7 @@ import { AdminLogsGateway } from './admin/admin-logs.gateway'; // 👈 Доба�
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot({ ttl: 60, limit: 20 }),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -37,6 +40,10 @@ import { AdminLogsGateway } from './admin/admin-logs.gateway'; // 👈 Доба�
   providers: [
     AppService,
     AdminLogsGateway, // 👈 Добавлен gateway для Live-логов!
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
