@@ -15,7 +15,9 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma
 
 # Установка прод-зависимостей
-RUN npm install --legacy-peer-deps
+ENV NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000
+RUN npm install --legacy-peer-deps --unsafe-perm
 
 # Копирование исходников проекта
 COPY . .
