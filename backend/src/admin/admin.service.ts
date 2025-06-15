@@ -157,4 +157,30 @@ export class AdminService {
       throw new InternalServerErrorException('Не удалось получить активность по часам');
     }
   }
+
+  /** 📟 Статус оборудования (пинг IP-адресов) */
+  async getMonitoring() {
+    const ping = await import('ping');
+    try {
+      const equipment = await this.prisma.equipment.findMany({
+        select: { id: true, name: true, ipAddress: true },
+      });
+
+      const results = await Promise.all(
+        equipment.map(async (item) => {
+          if (!item.ipAddress) return { ...item, status: 'unknown' };
+          try {
+            const res = await ping.promise.probe(item.ipAddress, { timeout: 2 });
+            return { ...item, status: res.alive ? 'online' : 'offline' };
+          } catch {
+            return { ...item, status: 'offline' };
+          }
+        })
+      );
+      return results;
+    } catch (error) {
+      this.logger.error('❌ Ошибка мониторинга оборудования', error instanceof Error ? error.stack : '');
+      throw new InternalServerErrorException('Не удалось получить данные мониторинга');
+    }
+  }
 }
